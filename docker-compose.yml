@@ -1,8 +1,9 @@
-version: '3.7'
+version: '3'
 services:
   api:
     container_name: appdoki-api
-    build: .
+#    build: .
+    build: cloudokihub/appdoki-be
     ports:
       - "4000:4000"
     depends_on:
