@@ -1,0 +1,156 @@
+openapi: 3.0.3
+info:
+  version: 1.0.0
+  title: appdoki API
+  description: REST API server for Cloudoki's appdoki
+  license:
+    name: MIT
+paths:
+  /users:
+    get:
+      tags: [ users ]
+      description: Lists all users
+      responses:
+        '200':
+          description: User model list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '500':
+          $ref: '#/components/responses/Internal'
+    post:
+      tags: [ users ]
+      description: Create a user if not exists
+      responses:
+        '200':
+          description: Create user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/Internal'
+  /users/{id}:
+    get:
+      description: Returns a user based on the ID
+      tags: [ users ]
+      parameters:
+        - name: id
+          in: path
+          description: ID of user to fetch
+          required: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: User model
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/Internal'
+  /oauth/url:
+    get:
+      tags: [ authentication ]
+      description: Returns the URL for the OAuth 2.0 provider's consent page
+      responses:
+        '200':
+          description: User model list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OAuthURL'
+  /oauth/token:
+    post:
+      tags: [ authentication ]
+      description: Exchange OAuth 2.0 authentication code for an access token
+      responses:
+        '200':
+          description: ID Token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Token'
+components:
+  schemas:
+    Token:
+      type: object
+      properties:
+        token:
+          type: string
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+    OAuthURL:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+    Error:
+      type: object
+      required:
+        - errors
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Conflict:
+      description: Resource conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Internal:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+  securitySchemes:
+    Bearer:
+      type: apiKey
+      name: Authorization
+      in: header
