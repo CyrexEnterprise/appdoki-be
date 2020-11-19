@@ -3,7 +3,7 @@ services:
   api:
     container_name: appdoki-api
 #    build: .
-    build: cloudokihub/appdoki-be:latest
+    image: cloudokihub/appdoki-be:latest
     ports:
       - "4000:4000"
     depends_on:
