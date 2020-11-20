@@ -124,7 +124,7 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '500':
           $ref: '#/components/responses/Internal'
-  /oauth/url:
+  /auth/url:
     get:
       tags: [ authentication ]
       description: Returns the URL for the OAuth 2.0 provider's consent page
@@ -137,7 +137,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/OAuthURL'
-  /oauth/token:
+  /auth/token:
     post:
       tags: [ authentication ]
       description: Exchange OAuth 2.0 authentication code for an access token
@@ -148,7 +148,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Token'
-  /oauth/user:
+  /auth/user:
     get:
       tags: [ authentication ]
       description: Creates a new user if not existing yet
