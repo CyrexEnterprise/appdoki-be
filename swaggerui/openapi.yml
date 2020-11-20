@@ -149,7 +149,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Token'
   /oauth/user:
-    post:
+    get:
       tags: [ authentication ]
       description: Creates a new user if not existing yet
       security:
