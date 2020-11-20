@@ -11,11 +11,10 @@ INSERT INTO status (name) VALUES
     ('Away');
 
 CREATE TABLE IF NOT EXISTS users (
-    id                  SERIAL PRIMARY KEY,
+    id                  TEXT PRIMARY KEY,
     email               VARCHAR(255) NOT NULL UNIQUE,
     name                VARCHAR(32) NOT NULL,
     picture             VARCHAR(255) NULL,
     status_id           INT NULL REFERENCES status(id),
-    oidc_userid         TEXT NULL,
     oidc_refresh_token  TEXT NULL
 );

@@ -24,6 +24,7 @@ type UsersRepositoryInterface interface {
 	Create(ctx context.Context, user *User) (*User, error)
 	Update(ctx context.Context, user *User) (*User, error)
 	Delete(ctx context.Context, ID string) (bool, error)
+	AddBeerTransfer(ctx context.Context, giverID string, takerID string, beers int) error
 }
 
 // UsersRepository implements UsersRepositoryInterface
@@ -88,14 +89,17 @@ func (r *UsersRepository) FindOrCreateUser(ctx context.Context, userData *User) 
 	defer tx.Rollback()
 
 	user := &User{}
-	selectStmt := "SELECT id, name, email FROM users WHERE email = $1"
-	err = tx.GetContext(ctx, user, selectStmt, userData.Email)
+	selectStmt := "SELECT id, name, email, picture FROM users WHERE id = $1"
+	err = tx.GetContext(ctx, user, selectStmt, userData.ID)
 	if err == nil {
 		return user, nil
 	}
+	if err != sql.ErrNoRows {
+		return nil, parseError(err)
+	}
 
-	insertStmt := "INSERT INTO users (name, email, oidc_userid) VALUES ($1, $2, $3) RETURNING id"
-	res, err := tx.ExecContext(ctx, insertStmt, userData.Name, userData.Email, userData.OIDCUserId)
+	insertStmt := "INSERT INTO users (id, name, email, picture) VALUES ($1, $2, $3, $4) RETURNING id"
+	res, err := tx.ExecContext(ctx, insertStmt, userData.ID, userData.Name, userData.Email, userData.Picture)
 	if err != nil {
 		return nil, parseError(err)
 	}
@@ -107,7 +111,7 @@ func (r *UsersRepository) FindOrCreateUser(ctx context.Context, userData *User) 
 		return nil, parseError(err)
 	}
 
-	err = tx.GetContext(ctx, user, selectStmt, userData.Email)
+	err = tx.GetContext(ctx, user, selectStmt, userData.ID)
 	if err != nil {
 		return nil, parseError(err)
 	}
@@ -160,4 +164,14 @@ func (r *UsersRepository) Delete(ctx context.Context, ID string) (bool, error) {
 		return false, err
 	}
 	return rows > 0, nil
+}
+
+func (r *UsersRepository) AddBeerTransfer(ctx context.Context, giverID string, takerID string, beers int) error {
+	stmt := "INSERT INTO beer_transfers (giver_id, taker_id, beers) VALUES ($1, $2, $3)"
+	_, err := r.db.ExecContext(ctx, stmt, giverID, takerID, beers)
+	if err != nil {
+		return parseError(err)
+	}
+
+	return nil
 }

@@ -10,6 +10,8 @@ paths:
     get:
       tags: [ users ]
       description: Lists all users
+      security:
+        - bearerAuth: [ ]
       responses:
         '200':
           description: User model list
@@ -19,24 +21,12 @@ paths:
                 $ref: '#/components/schemas/User'
         '500':
           $ref: '#/components/responses/Internal'
-    post:
-      tags: [ users ]
-      description: Create a user if not exists
-      responses:
-        '200':
-          description: Create user
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '500':
-          $ref: '#/components/responses/Internal'
   /users/{id}:
     get:
-      description: Returns a user based on the ID
       tags: [ users ]
+      description: Returns a user based on the ID
+      security:
+        - bearerAuth: [ ]
       parameters:
         - name: id
           in: path
@@ -53,6 +43,37 @@ paths:
                 $ref: '#/components/schemas/User'
         '404':
           $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/Internal'
+  /users/{id}/beers/{beers}:
+    post:
+      tags: [ users ]
+      description: Give this man some beers!
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the user receiving beers
+        - in: path
+          name: beers
+          schema:
+            type: integer
+            minimum: 1
+          required: true
+          description: Amount of beers
+      responses:
+        '204':
+          description: Beers given! Thanks
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '500':
           $ref: '#/components/responses/Internal'
   /oauth/url:
@@ -72,6 +93,18 @@ paths:
     post:
       tags: [ authentication ]
       description: Exchange OAuth 2.0 authentication code for an access token
+      requestBody:
+        description: Auth code payload
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - code
+              properties:
+                code:
+                  type: string
       responses:
         '200':
           description: ID Token
@@ -150,7 +183,7 @@ components:
             $ref: '#/components/schemas/Error'
 
   securitySchemes:
-    Bearer:
-      type: apiKey
-      name: Authorization
-      in: header
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

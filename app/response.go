@@ -37,3 +37,7 @@ func respondInternalError(w http.ResponseWriter) {
 		log.Errorln("respondInternalError", err)
 	}
 }
+
+func respondNoContent(w http.ResponseWriter, statusCode int) {
+	w.WriteHeader(statusCode)
+}

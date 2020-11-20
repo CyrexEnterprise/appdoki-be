@@ -3,8 +3,10 @@ package app
 import (
 	"appdoki-be/app/repositories"
 	"encoding/json"
+	"fmt"
 	"github.com/gorilla/mux"
 	"net/http"
+	"strconv"
 )
 
 type CreateUserPayload struct {
@@ -167,4 +169,53 @@ func (h *UsersHandler) Update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	respondJSON(w, user, http.StatusOK)
+}
+
+func (h *UsersHandler) GiveBeers(w http.ResponseWriter, r *http.Request) {
+	userID := fmt.Sprintf("%v", r.Context().Value("userID"))
+
+	vars := mux.Vars(r)
+	takerUserId, ok := vars["id"]
+	if !ok {
+		respondJSON(w, &appError{
+			Errors: []string{"invalid id param"},
+		}, http.StatusBadRequest)
+		return
+	}
+
+	if userID == takerUserId {
+		respondJSON(w, &appError{
+			Errors: []string{"oi, cheeky bastard, give beers to others"},
+		}, http.StatusForbidden)
+		return
+	}
+
+	beersParam, ok := vars["beers"]
+	if !ok {
+		respondJSON(w, &appError{
+			Errors: []string{"invalid beers param"},
+		}, http.StatusBadRequest)
+		return
+	}
+
+	beers, err := strconv.Atoi(beersParam)
+	if err != nil {
+		respondInternalError(w)
+		return
+	}
+
+	if beers <= 0 {
+		respondJSON(w, &appError{
+			Errors: []string{"invalid amount of beers: don't be a cheap bastard!"},
+		}, http.StatusBadRequest)
+		return
+	}
+
+	err = h.userRepo.AddBeerTransfer(r.Context(), userID, takerUserId, beers)
+	if err != nil {
+		respondInternalError(w)
+		return
+	}
+
+	respondNoContent(w, http.StatusNoContent)
 }

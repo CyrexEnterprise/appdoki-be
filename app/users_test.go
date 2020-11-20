@@ -18,6 +18,7 @@ type mockUsersRepository struct {
 	createImpl           func(ctx context.Context, user *repositories.User) (*repositories.User, error)
 	updateImpl           func(ctx context.Context, user *repositories.User) (*repositories.User, error)
 	deleteImpl           func(ctx context.Context, ID string) (bool, error)
+	addBeerTransferImpl  func(ctx context.Context, giverID string, takerID string, beers int) error
 }
 
 func (r *mockUsersRepository) GetAll(ctx context.Context) ([]*repositories.User, error) {
@@ -46,6 +47,10 @@ func (r *mockUsersRepository) Update(ctx context.Context, user *repositories.Use
 
 func (r *mockUsersRepository) Delete(ctx context.Context, ID string) (bool, error) {
 	return r.deleteImpl(ctx, ID)
+}
+
+func (r *mockUsersRepository) AddBeerTransfer(ctx context.Context, giverID string, takerID string, beers int) error {
+	return nil
 }
 
 func getDefaultMockUsersRepository() *mockUsersRepository {

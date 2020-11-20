@@ -1,7 +1,9 @@
 package app
 
 import (
+	"context"
 	"fmt"
+	"github.com/coreos/go-oidc"
 	log "github.com/sirupsen/logrus"
 	"net/http"
 	"strings"
@@ -48,4 +50,32 @@ func loggingMiddleware(next http.Handler) http.Handler {
 			"status": rec.status,
 		}).Info("handled request")
 	})
+}
+
+func (a *Application) JwtVerify(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		const headerPrefix = "Bearer "
+		tokenHeader := r.Header.Get("Authorization")
+
+		if !strings.HasPrefix(tokenHeader, headerPrefix) {
+			respondNoContent(w, http.StatusUnauthorized)
+			return
+		}
+
+		token := strings.TrimPrefix(tokenHeader, headerPrefix)
+
+		verifier := a.conf.AppConfig.OIDCProvider.Verifier(&oidc.Config{
+			ClientID: a.conf.AppConfig.GoogleOauth.ClientID,
+		})
+
+		parsedToken, err := verifier.Verify(r.Context(), token)
+		if err != nil {
+			respondNoContent(w, http.StatusUnauthorized)
+			return
+		}
+
+		newReq := r.WithContext(context.WithValue(r.Context(), "userID", parsedToken.Subject))
+
+		next.ServeHTTP(w, newReq)
+	}
 }

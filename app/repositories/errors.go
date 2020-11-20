@@ -3,6 +3,7 @@ package repositories
 import (
 	"fmt"
 	"github.com/lib/pq"
+	log "github.com/sirupsen/logrus"
 	"regexp"
 )
 
@@ -20,6 +21,8 @@ func (e *ConflictError) Error() string {
 // or returns the error itself if there is no matching parser.
 // If there is a match, the resulting error may be a custom one.
 func parseError(e error) error {
+	log.Error("database error: ", e)
+
 	pqErr, ok := e.(*pq.Error)
 	if !ok {
 		return e

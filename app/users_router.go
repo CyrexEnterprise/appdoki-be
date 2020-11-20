@@ -13,11 +13,16 @@ func (a *Application) UsersRouter(router *mux.Router) {
 		Path("/users").
 		HandlerFunc(a.JwtVerify(usersHandler.Get))
 
-	//router.
-	//	Methods(http.MethodPost).
-	//	Path("/users").
-	//	HandlerFunc(usersHandler.Create)
-	//
+	router.
+		Methods(http.MethodGet).
+		Path("/users/{id}").
+		HandlerFunc(a.JwtVerify(usersHandler.GetByID))
+
+	router.
+		Methods(http.MethodPost).
+		Path("/users/{id}/beers/{beers}").
+		HandlerFunc(a.JwtVerify(usersHandler.GiveBeers))
+
 	//router.
 	//	Methods(http.MethodPut).
 	//	Path("/{id}").

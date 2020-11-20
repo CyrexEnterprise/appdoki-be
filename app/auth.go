@@ -6,6 +6,7 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/base64"
+	"encoding/json"
 	"github.com/coreos/go-oidc"
 	"golang.org/x/oauth2"
 	"net/http"
@@ -16,6 +17,10 @@ import (
 type AuthHandler struct {
 	appConfig config.AppConfig
 	userRepo  repositories.UsersRepositoryInterface
+}
+
+type AuthCodePayload struct {
+	Token string `json:"token"`
 }
 
 // NewOAuthHandler returns an initialized users handler with the required dependencies
@@ -62,6 +67,64 @@ func generateStateOauthCookie(w http.ResponseWriter) string {
 }
 
 func (h *AuthHandler) Token(w http.ResponseWriter, r *http.Request) {
+	var codePayload AuthCodePayload
+	err := json.NewDecoder(r.Body).Decode(&codePayload)
+	if err != nil {
+		respondInternalError(w)
+		return
+	}
+
+	token, err := h.appConfig.GoogleOauth.Exchange(context.Background(), codePayload.Token)
+	if err != nil {
+		respondInternalError(w)
+		return
+	}
+
+	rawIDToken, ok := token.Extra("id_token").(string)
+	if !ok {
+		respondInternalError(w)
+		return
+	}
+
+	verifier := h.appConfig.OIDCProvider.Verifier(&oidc.Config{
+		ClientID: h.appConfig.GoogleOauth.ClientID,
+	})
+
+	idToken, err := verifier.Verify(r.Context(), rawIDToken)
+	if err != nil {
+		respondInternalError(w)
+		return
+	}
+
+	var idTokenClaims struct {
+		Email   string `json:"email"`
+		Name    string `json:"name"`
+		Picture string `json:"picture"`
+	}
+	if err := idToken.Claims(&idTokenClaims); err != nil {
+		respondInternalError(w)
+		return
+	}
+
+	_, err = h.userRepo.FindOrCreateUser(r.Context(), &repositories.User{
+		ID:      idToken.Subject,
+		Name:    idTokenClaims.Name,
+		Email:   idTokenClaims.Email,
+		Picture: idTokenClaims.Picture,
+	})
+	if err != nil {
+		respondInternalError(w)
+		return
+	}
+
+	respondJSON(w, struct {
+		Token string
+	}{
+		Token: rawIDToken,
+	}, http.StatusOK)
+}
+
+func (h *AuthHandler) Callback(w http.ResponseWriter, r *http.Request) {
 	code := r.URL.Query().Get("code")
 
 	token, err := h.appConfig.GoogleOauth.Exchange(context.Background(), code)
@@ -97,10 +160,10 @@ func (h *AuthHandler) Token(w http.ResponseWriter, r *http.Request) {
 	}
 
 	_, err = h.userRepo.FindOrCreateUser(r.Context(), &repositories.User{
-		Name:       idTokenClaims.Name,
-		Email:      idTokenClaims.Email,
-		Picture:    idTokenClaims.Picture,
-		OIDCUserId: idToken.Subject,
+		ID:      idToken.Subject,
+		Name:    idTokenClaims.Name,
+		Email:   idTokenClaims.Email,
+		Picture: idTokenClaims.Picture,
 	})
 	if err != nil {
 		respondInternalError(w)
