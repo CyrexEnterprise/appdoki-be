@@ -11,6 +11,7 @@ import (
 	"github.com/coreos/go-oidc"
 	"golang.org/x/oauth2"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -199,4 +200,36 @@ func (h *AuthHandler) Revoke(w http.ResponseWriter, r *http.Request) {
 	}
 
 	respondNoContent(w, http.StatusNoContent)
+}
+
+func (h *AuthHandler) FindCreateUser(w http.ResponseWriter, r *http.Request) {
+	verifier := h.appConfig.OIDCProvider.Verifier(&oidc.Config{
+		ClientID: h.appConfig.GoogleOauth.ClientID,
+	})
+
+	rawIDToken := strings.TrimPrefix(r.Header.Get("Authorization"), "Bearer ")
+	idToken, err := verifier.Verify(r.Context(), rawIDToken)
+	if err != nil {
+		respondInternalError(w)
+		return
+	}
+
+	var idTokenClaims struct {
+		Email   string `json:"email"`
+		Name    string `json:"name"`
+		Picture string `json:"picture"`
+	}
+	if err := idToken.Claims(&idTokenClaims); err != nil {
+		respondInternalError(w)
+		return
+	}
+
+	user, err := h.userRepo.FindOrCreateUser(r.Context(), &repositories.User{
+		ID:      idToken.Subject,
+		Name:    idTokenClaims.Name,
+		Email:   idTokenClaims.Email,
+		Picture: idTokenClaims.Picture,
+	})
+
+	respondJSON(w, user, http.StatusOK)
 }

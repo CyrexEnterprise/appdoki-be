@@ -81,7 +81,7 @@ func (r *UsersRepository) FindByEmail(ctx context.Context, email string) (*User,
 	return user, nil
 }
 
-// FindOrCreateUser finds a user by email and creates it if not found
+// FindOrCreateUser finds a user by ID and creates it if not found
 // TODO deal with passing txn around
 func (r *UsersRepository) FindOrCreateUser(ctx context.Context, userData *User) (*User, error) {
 	tx, err := r.db.BeginTxx(ctx, nil)

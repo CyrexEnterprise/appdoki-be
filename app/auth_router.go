@@ -33,4 +33,9 @@ func (a *Application) AuthRouter(router *mux.Router) {
 		Methods(http.MethodGet).
 		Path("/auth/url").
 		HandlerFunc(a.JwtVerify(authHandler.GetURL))
+
+	router.
+		Methods(http.MethodGet).
+		Path("/auth/user").
+		HandlerFunc(a.JwtVerify(authHandler.FindCreateUser))
 }

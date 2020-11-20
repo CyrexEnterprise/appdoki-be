@@ -134,18 +134,6 @@ paths:
     post:
       tags: [ authentication ]
       description: Exchange OAuth 2.0 authentication code for an access token
-      requestBody:
-        description: Auth code payload
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - code
-              properties:
-                code:
-                  type: string
       responses:
         '200':
           description: ID Token
@@ -153,6 +141,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Token'
+  /oauth/user:
+    post:
+      tags: [ authentication ]
+      description: Creates a new user if not existing yet
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: User model
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
 components:
   schemas:
     Token:
@@ -168,6 +169,8 @@ components:
         name:
           type: string
         email:
+          type: string
+        picture:
           type: string
     UserBeerLog:
       type: object
