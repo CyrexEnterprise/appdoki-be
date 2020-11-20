@@ -8,10 +8,10 @@ import (
 
 // User model
 type User struct {
-	ID         string `json:"id" db:"id"`
-	Name       string `json:"name" db:"name"`
-	Email      string `json:"email" db:"email"`
-	Picture    string `json:"picture" db:"picture"`
+	ID      string `json:"id" db:"id"`
+	Name    string `json:"name" db:"name"`
+	Email   string `json:"email" db:"email"`
+	Picture string `json:"picture" db:"picture"`
 }
 
 type UserBeerLog struct {
@@ -40,10 +40,6 @@ type UsersRepository struct {
 // NewUsersRepository returns a configured UsersRepository object
 func NewUsersRepository(db *sqlx.DB) *UsersRepository {
 	return &UsersRepository{db: db}
-}
-
-func (r *UsersRepository) GetDB() *sqlx.DB {
-	return r.db
 }
 
 // GetAll fetches all users, returns an empty slice if no user exists

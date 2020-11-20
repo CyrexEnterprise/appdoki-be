@@ -11,14 +11,14 @@ import (
 )
 
 type mockUsersRepository struct {
-	getAllImpl           func(ctx context.Context) ([]*repositories.User, error)
-	findByIDImpl         func(ctx context.Context, ID string) (*repositories.User, error)
-	findByEmailImpl      func(ctx context.Context, email string) (*repositories.User, error)
-	findOrCreateUserImpl func(ctx context.Context, userData *repositories.User) (*repositories.User, error)
-	createImpl           func(ctx context.Context, user *repositories.User) (*repositories.User, error)
-	updateImpl           func(ctx context.Context, user *repositories.User) (*repositories.User, error)
-	deleteImpl           func(ctx context.Context, ID string) (bool, error)
-	addBeerTransferImpl  func(ctx context.Context, giverID string, takerID string, beers int) error
+	getAllImpl             func(ctx context.Context) ([]*repositories.User, error)
+	findByIDImpl           func(ctx context.Context, ID string) (*repositories.User, error)
+	findByEmailImpl        func(ctx context.Context, email string) (*repositories.User, error)
+	findOrCreateUserImpl   func(ctx context.Context, userData *repositories.User) (*repositories.User, error)
+	createImpl             func(ctx context.Context, user *repositories.User) (*repositories.User, error)
+	updateImpl             func(ctx context.Context, user *repositories.User) (*repositories.User, error)
+	deleteImpl             func(ctx context.Context, ID string) (bool, error)
+	addBeerTransferImpl    func(ctx context.Context, giverID string, takerID string, beers int) error
 	getBeerTransferLogImpl func(ctx context.Context, userID string) (*repositories.UserBeerLog, error)
 }
 

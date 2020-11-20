@@ -11,12 +11,14 @@ import (
 type Application struct {
 	conf            *config.Config
 	usersRepository repositories.UsersRepositoryInterface
+	beersRepository repositories.BeersRepositoryInterface
 }
 
 func NewApplication(conf *config.Config, db *sqlx.DB) *Application {
 	return &Application{
 		conf:            conf,
 		usersRepository: repositories.NewUsersRepository(db),
+		beersRepository: repositories.NewBeersRepository(db),
 	}
 }
 
@@ -26,6 +28,7 @@ func (a *Application) Routes() http.Handler {
 
 	a.AuthRouter(router)
 	a.UsersRouter(router)
+	a.BeersRouter(router)
 
 	fs := http.FileServer(http.Dir("./swaggerui/"))
 	router.
