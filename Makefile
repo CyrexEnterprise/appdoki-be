@@ -11,9 +11,8 @@ migrate-create:
 		-seq \
 		"$(MIGRATION_NAME)"
 
-compose-up:
-	mkdir -p ~/docker/postgres_appdoki
-	VOLUME_DIR=~/docker/postgres_appdoki docker-compose up -d
+compose:
+	source .env && docker-compose up -d --force-recreate --build
 
 test:
 	go test ./...

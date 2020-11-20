@@ -28,7 +28,9 @@ func (a *Application) Routes() http.Handler {
 	a.UsersRouter(router)
 
 	fs := http.FileServer(http.Dir("./swaggerui/"))
-	router.PathPrefix("/docs/").Handler(http.StripPrefix("/docs/", fs))
+	router.
+		PathPrefix("/docs").
+		Handler(http.StripPrefix("/docs", fs))
 
 	return middlewareChain([]middleware{
 		trimSuffixMiddleware,
