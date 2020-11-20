@@ -12,7 +12,11 @@ type User struct {
 	Name       string `json:"name" db:"name"`
 	Email      string `json:"email" db:"email"`
 	Picture    string `json:"picture" db:"picture"`
-	OIDCUserId string `json:"-" db:"oidc_userid"`
+}
+
+type UserBeerLog struct {
+	Given    int `json:"given" db:"given"`
+	Received int `json:"received " db:"received"`
 }
 
 // UsersRepositoryInterface defines the set of User related methods available
@@ -25,6 +29,7 @@ type UsersRepositoryInterface interface {
 	Update(ctx context.Context, user *User) (*User, error)
 	Delete(ctx context.Context, ID string) (bool, error)
 	AddBeerTransfer(ctx context.Context, giverID string, takerID string, beers int) error
+	GetBeerTransferLog(ctx context.Context, userID string) (*UserBeerLog, error)
 }
 
 // UsersRepository implements UsersRepositoryInterface
@@ -174,4 +179,22 @@ func (r *UsersRepository) AddBeerTransfer(ctx context.Context, giverID string, t
 	}
 
 	return nil
+}
+
+func (r *UsersRepository) GetBeerTransferLog(ctx context.Context, userID string) (*UserBeerLog, error) {
+	beerLog := &UserBeerLog{}
+
+	giverQuery := "SELECT COALESCE(SUM(beers)) AS given FROM beer_transfers WHERE giver_id = $1"
+	err := r.db.GetContext(ctx, beerLog, giverQuery, userID)
+	if err != nil {
+		return nil, parseError(err)
+	}
+
+	receivedQuery := "SELECT COALESCE(SUM(beers)) AS received FROM beer_transfers WHERE taker_id = $1"
+	err = r.db.GetContext(ctx, beerLog, receivedQuery, userID)
+	if err != nil {
+		return nil, parseError(err)
+	}
+
+	return beerLog, nil
 }

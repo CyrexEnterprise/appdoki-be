@@ -45,6 +45,30 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/Internal'
+  /users/{id}/beers:
+    get:
+      tags: [ users ]
+      description: Returns a simple beer report for a user
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          description: ID of user to fetch
+          required: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: User beer report
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserBeerLog'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/Internal'
   /users/{id}/beers/{beers}:
     post:
       tags: [ users ]
@@ -128,6 +152,13 @@ components:
           type: string
         email:
           type: string
+    UserBeerLog:
+      type: object
+      properties:
+        given:
+          type: number
+        received:
+          type: number
     OAuthURL:
       type: object
       properties:

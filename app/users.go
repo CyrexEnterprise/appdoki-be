@@ -219,3 +219,21 @@ func (h *UsersHandler) GiveBeers(w http.ResponseWriter, r *http.Request) {
 
 	respondNoContent(w, http.StatusNoContent)
 }
+
+func (h *UsersHandler) BeersLog(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	userID, ok := vars["id"]
+	if !ok {
+		respondJSON(w, &appError{
+			Errors: []string{"invalid id param"},
+		}, http.StatusBadRequest)
+		return
+	}
+
+	beerLog, err := h.userRepo.GetBeerTransferLog(r.Context(), userID)
+	if err != nil {
+		respondInternalError(w)
+	}
+
+	respondJSON(w, beerLog, http.StatusOK)
+}

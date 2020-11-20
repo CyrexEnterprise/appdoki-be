@@ -19,6 +19,11 @@ func (a *Application) UsersRouter(router *mux.Router) {
 		HandlerFunc(a.JwtVerify(usersHandler.GetByID))
 
 	router.
+		Methods(http.MethodGet).
+		Path("/users/{id}/beers").
+		HandlerFunc(a.JwtVerify(usersHandler.BeersLog))
+
+	router.
 		Methods(http.MethodPost).
 		Path("/users/{id}/beers/{beers}").
 		HandlerFunc(a.JwtVerify(usersHandler.GiveBeers))
