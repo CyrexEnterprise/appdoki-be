@@ -9,8 +9,9 @@ import (
 
 // AppConfig contains API/business configurations
 type AppConfig struct {
-	OIDCProvider *oidc.Provider
-	GoogleOauth  oauth2.Config
+	OIDCProvider   *oidc.Provider
+	GoogleOauth    oauth2.Config
+	RevokeEndpoint string
 }
 
 // ServerConfig contains server configurations (HTTP, etc)
@@ -43,7 +44,8 @@ func NewConfig() *Config {
 			Address: getEnv("ADDRESS", "localhost:4000"),
 		},
 		AppConfig: AppConfig{
-			OIDCProvider: provider,
+			OIDCProvider:   provider,
+			RevokeEndpoint: getEnv("GOOGLE_OIDC_REVOKE_URL", "https://oauth2.googleapis.com/revoke"),
 			GoogleOauth: oauth2.Config{
 				ClientID:     os.Getenv("GOOGLE_OAUTH_CLIENT_ID"),
 				ClientSecret: os.Getenv("GOOGLE_OAUTH_CLIENT_SECRET"),

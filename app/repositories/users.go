@@ -30,6 +30,7 @@ type UsersRepositoryInterface interface {
 	Delete(ctx context.Context, ID string) (bool, error)
 	AddBeerTransfer(ctx context.Context, giverID string, takerID string, beers int) error
 	GetBeerTransferLog(ctx context.Context, userID string) (*UserBeerLog, error)
+	ClearTokens(ctx context.Context, ID string) error
 }
 
 // UsersRepository implements UsersRepositoryInterface
@@ -193,4 +194,14 @@ func (r *UsersRepository) GetBeerTransferLog(ctx context.Context, userID string)
 	}
 
 	return beerLog, nil
+}
+
+func (r *UsersRepository) ClearTokens(ctx context.Context, userID string) error {
+	stmt := "UPDATE users SET oidc_refresh_token = NULL WHERE id = $1"
+	_, err := r.db.ExecContext(ctx, stmt, userID)
+	if err != nil {
+		return parseError(err)
+	}
+
+	return nil
 }

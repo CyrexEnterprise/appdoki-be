@@ -25,6 +25,11 @@ func (a *Application) AuthRouter(router *mux.Router) {
 		HandlerFunc(authHandler.Token)
 
 	router.
+		Methods(http.MethodPost).
+		Path("/auth/revoke").
+		HandlerFunc(a.JwtVerify(authHandler.Revoke))
+
+	router.
 		Methods(http.MethodGet).
 		Path("/auth/url").
 		HandlerFunc(a.JwtVerify(authHandler.GetURL))

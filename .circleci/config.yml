@@ -30,8 +30,8 @@ jobs:
       - run:
           name: Deploy Over SSH
           command: |
-            scp -r -o StrictHostKeyChecking=no docker-compose.yml $SSH_USER@$SSH_HOST:~/appdoki/
-            ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "cd appdoki && docker-compose pull && source .env && docker-compose up -d --force-recreate"
+            scp -r -o StrictHostKeyChecking=no docker-compose.yml Makefile $SSH_USER@$SSH_HOST:~/appdoki/
+            ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "cd appdoki && make compose-update"
 
 workflows:
   version: 2

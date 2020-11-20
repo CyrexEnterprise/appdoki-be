@@ -7,6 +7,7 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"github.com/coreos/go-oidc"
 	"golang.org/x/oauth2"
 	"net/http"
@@ -20,6 +21,10 @@ type AuthHandler struct {
 }
 
 type AuthCodePayload struct {
+	Code string `json:"code"`
+}
+
+type TokenPayload struct {
 	Token string `json:"token"`
 }
 
@@ -74,7 +79,7 @@ func (h *AuthHandler) Token(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, err := h.appConfig.GoogleOauth.Exchange(context.Background(), codePayload.Token)
+	token, err := h.appConfig.GoogleOauth.Exchange(context.Background(), codePayload.Code)
 	if err != nil {
 		respondInternalError(w)
 		return
@@ -175,4 +180,23 @@ func (h *AuthHandler) Callback(w http.ResponseWriter, r *http.Request) {
 	}{
 		Token: rawIDToken,
 	}, http.StatusOK)
+}
+
+func (h *AuthHandler) Revoke(w http.ResponseWriter, r *http.Request) {
+	var tokenPayload TokenPayload
+	err := json.NewDecoder(r.Body).Decode(&tokenPayload)
+	if err != nil {
+		respondInternalError(w)
+		return
+	}
+
+	userID := fmt.Sprintf("%v", r.Context().Value("userID"))
+
+	err = h.userRepo.ClearTokens(r.Context(), userID)
+	if err != nil {
+		respondInternalError(w)
+		return
+	}
+
+	respondNoContent(w, http.StatusNoContent)
 }

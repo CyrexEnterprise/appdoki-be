@@ -20,6 +20,7 @@ type mockUsersRepository struct {
 	deleteImpl             func(ctx context.Context, ID string) (bool, error)
 	addBeerTransferImpl    func(ctx context.Context, giverID string, takerID string, beers int) error
 	getBeerTransferLogImpl func(ctx context.Context, userID string) (*repositories.UserBeerLog, error)
+	clearTokensImpl		   func(ctx context.Context, ID string) error
 }
 
 func (r *mockUsersRepository) GetAll(ctx context.Context) ([]*repositories.User, error) {
@@ -51,11 +52,15 @@ func (r *mockUsersRepository) Delete(ctx context.Context, ID string) (bool, erro
 }
 
 func (r *mockUsersRepository) AddBeerTransfer(ctx context.Context, giverID string, takerID string, beers int) error {
-	return nil
+	return r.addBeerTransferImpl(ctx, giverID, takerID, beers)
 }
 
 func (r *mockUsersRepository) GetBeerTransferLog(ctx context.Context, userID string) (*repositories.UserBeerLog, error) {
-	return &repositories.UserBeerLog{}, nil
+	return r.getBeerTransferLogImpl(ctx, userID)
+}
+
+func (r *mockUsersRepository) ClearTokens(ctx context.Context, ID string) error {
+	return r.clearTokensImpl(ctx, ID)
 }
 
 func getDefaultMockUsersRepository() *mockUsersRepository {
