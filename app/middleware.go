@@ -52,20 +52,27 @@ func loggingMiddleware(next http.Handler) http.Handler {
 	})
 }
 
+const(
+	Web = "web"
+	IOS = "ios"
+	Android = "Android"
+)
+
 func (a *Application) JwtVerify(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		const headerPrefix = "Bearer "
+		const bearerHeaderPrefix = "Bearer "
 		tokenHeader := r.Header.Get("Authorization")
+		platform := parsePlatformHeader(r.Header.Get("platform"))
 
-		if !strings.HasPrefix(tokenHeader, headerPrefix) {
+		if !strings.HasPrefix(tokenHeader, bearerHeaderPrefix) {
 			respondNoContent(w, http.StatusUnauthorized)
 			return
 		}
 
-		token := strings.TrimPrefix(tokenHeader, headerPrefix)
+		token := strings.TrimPrefix(tokenHeader, bearerHeaderPrefix)
 
 		verifier := a.conf.AppConfig.OIDCProvider.Verifier(&oidc.Config{
-			ClientID: a.conf.AppConfig.GoogleOauth.ClientID,
+			ClientID: a.conf.AppConfig.GetPlatformClientID(platform),
 		})
 
 		parsedToken, err := verifier.Verify(r.Context(), token)
@@ -78,4 +85,11 @@ func (a *Application) JwtVerify(next http.HandlerFunc) http.HandlerFunc {
 
 		next.ServeHTTP(w, newReq)
 	}
+}
+
+func parsePlatformHeader(platformHeader string) string {
+	if platformHeader != Web && platformHeader != IOS && platformHeader != Android {
+		platformHeader = Web
+	}
+	return platformHeader
 }

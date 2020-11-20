@@ -203,8 +203,9 @@ func (h *AuthHandler) Revoke(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *AuthHandler) FindCreateUser(w http.ResponseWriter, r *http.Request) {
+	platform := parsePlatformHeader(r.Header.Get("platform"))
 	verifier := h.appConfig.OIDCProvider.Verifier(&oidc.Config{
-		ClientID: h.appConfig.GoogleOauth.ClientID,
+		ClientID: h.appConfig.GetPlatformClientID(platform),
 	})
 
 	rawIDToken := strings.TrimPrefix(r.Header.Get("Authorization"), "Bearer ")

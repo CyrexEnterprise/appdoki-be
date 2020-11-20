@@ -12,6 +12,8 @@ paths:
       description: Lists all users
       security:
         - bearerAuth: [ ]
+      parameters:
+        - $ref: '#/components/parameters/platformHeader'
       responses:
         '200':
           description: User model list
@@ -28,6 +30,7 @@ paths:
       security:
         - bearerAuth: [ ]
       parameters:
+        - $ref: '#/components/parameters/platformHeader'
         - name: id
           in: path
           description: ID of user to fetch
@@ -52,6 +55,7 @@ paths:
       security:
         - bearerAuth: [ ]
       parameters:
+        - $ref: '#/components/parameters/platformHeader'
         - name: id
           in: path
           description: ID of user to fetch
@@ -76,6 +80,7 @@ paths:
       security:
         - bearerAuth: []
       parameters:
+        - $ref: '#/components/parameters/platformHeader'
         - in: path
           name: id
           schema:
@@ -106,6 +111,8 @@ paths:
       description: Returns a beer transference feed
       security:
         - bearerAuth: [ ]
+      parameters:
+        - $ref: '#/components/parameters/platformHeader'
       responses:
         '200':
           description: Beer log
@@ -147,6 +154,8 @@ paths:
       description: Creates a new user if not existing yet
       security:
         - bearerAuth: [ ]
+      parameters:
+        - $ref: '#/components/parameters/platformHeader'
       responses:
         '200':
           description: User model
@@ -247,6 +256,17 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
+
+  parameters:
+    platformHeader:
+      name: platform
+      in: header
+      description: Platorm identifying header
+      required: true
+      schema:
+        type: string
+        enum: [ web, ios, android ]
+        default: web
 
   securitySchemes:
     bearerAuth:
