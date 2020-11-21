@@ -21,7 +21,7 @@ func (a *Application) UsersRouter(router *mux.Router) {
 	router.
 		Methods(http.MethodGet).
 		Path("/users/{id}/beers").
-		HandlerFunc(a.JwtVerify(usersHandler.BeersLog))
+		HandlerFunc(a.JwtVerify(usersHandler.BeersSummary))
 
 	router.
 		Methods(http.MethodPost).

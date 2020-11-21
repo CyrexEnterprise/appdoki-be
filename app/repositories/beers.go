@@ -14,7 +14,7 @@ type BeerTransferFeedItem struct {
 
 // BeersRepositoryInterface defines the set of User related methods available
 type BeersRepositoryInterface interface {
-	GetBeerTransferLog(ctx context.Context) ([]BeerTransferFeedItem, error)
+	GetBeerTransfers(ctx context.Context) ([]BeerTransferFeedItem, error)
 }
 
 // BeersRepository implements UsersRepositoryInterface
@@ -27,7 +27,7 @@ func NewBeersRepository(db *sqlx.DB) *BeersRepository {
 	return &BeersRepository{db: db}
 }
 
-func (r *BeersRepository) GetBeerTransferLog(ctx context.Context) ([]BeerTransferFeedItem, error) {
+func (r *BeersRepository) GetBeerTransfers(ctx context.Context) ([]BeerTransferFeedItem, error) {
 	query := `
 		SELECT giver.id,
 				giver.name,

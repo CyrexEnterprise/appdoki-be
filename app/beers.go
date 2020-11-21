@@ -19,7 +19,7 @@ func NewBeersHandler(beersRepo repositories.BeersRepositoryInterface) *BeersHand
 
 // Get gets all the beer transfers
 func (h *BeersHandler) Get(w http.ResponseWriter, r *http.Request) {
-	feed, err := h.beersRepo.GetBeerTransferLog(r.Context())
+	feed, err := h.beersRepo.GetBeerTransfers(r.Context())
 	if err != nil {
 		respondInternalError(w)
 		return

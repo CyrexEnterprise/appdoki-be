@@ -220,7 +220,7 @@ func (h *UsersHandler) GiveBeers(w http.ResponseWriter, r *http.Request) {
 	respondNoContent(w, http.StatusNoContent)
 }
 
-func (h *UsersHandler) BeersLog(w http.ResponseWriter, r *http.Request) {
+func (h *UsersHandler) BeersSummary(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	userID, ok := vars["id"]
 	if !ok {
@@ -230,7 +230,7 @@ func (h *UsersHandler) BeersLog(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	beerLog, err := h.userRepo.GetBeerTransferLog(r.Context(), userID)
+	beerLog, err := h.userRepo.GetBeerTransfersSummary(r.Context(), userID)
 	if err != nil {
 		respondInternalError(w)
 	}

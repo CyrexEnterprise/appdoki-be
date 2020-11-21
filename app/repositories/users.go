@@ -29,7 +29,7 @@ type UsersRepositoryInterface interface {
 	Update(ctx context.Context, user *User) (*User, error)
 	Delete(ctx context.Context, ID string) (bool, error)
 	AddBeerTransfer(ctx context.Context, giverID string, takerID string, beers int) error
-	GetBeerTransferLog(ctx context.Context, userID string) (*UserBeerLog, error)
+	GetBeerTransfersSummary(ctx context.Context, userID string) (*UserBeerLog, error)
 	ClearTokens(ctx context.Context, ID string) error
 }
 
@@ -178,7 +178,7 @@ func (r *UsersRepository) AddBeerTransfer(ctx context.Context, giverID string, t
 	return nil
 }
 
-func (r *UsersRepository) GetBeerTransferLog(ctx context.Context, userID string) (*UserBeerLog, error) {
+func (r *UsersRepository) GetBeerTransfersSummary(ctx context.Context, userID string) (*UserBeerLog, error) {
 	beerLog := &UserBeerLog{}
 
 	giverQuery := "SELECT COALESCE(SUM(beers), 0) AS given FROM beer_transfers WHERE giver_id = $1"

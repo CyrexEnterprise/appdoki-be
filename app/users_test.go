@@ -55,7 +55,7 @@ func (r *mockUsersRepository) AddBeerTransfer(ctx context.Context, giverID strin
 	return r.addBeerTransferImpl(ctx, giverID, takerID, beers)
 }
 
-func (r *mockUsersRepository) GetBeerTransferLog(ctx context.Context, userID string) (*repositories.UserBeerLog, error) {
+func (r *mockUsersRepository) GetBeerTransfersSummary(ctx context.Context, userID string) (*repositories.UserBeerLog, error) {
 	return r.getBeerTransferLogImpl(ctx, userID)
 }
 
