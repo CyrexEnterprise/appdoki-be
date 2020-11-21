@@ -47,7 +47,6 @@ func loggingMiddleware(next http.Handler) http.Handler {
 		next.ServeHTTP(&rec, r)
 		log.WithFields(log.Fields{
 			"req":    fmt.Sprintf("%s %s", r.Method, r.RequestURI),
-			"headers": r.Header,
 			"status": rec.status,
 		}).Info("handled request")
 	})

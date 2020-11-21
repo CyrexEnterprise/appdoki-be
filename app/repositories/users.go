@@ -181,13 +181,13 @@ func (r *UsersRepository) AddBeerTransfer(ctx context.Context, giverID string, t
 func (r *UsersRepository) GetBeerTransferLog(ctx context.Context, userID string) (*UserBeerLog, error) {
 	beerLog := &UserBeerLog{}
 
-	giverQuery := "SELECT COALESCE(SUM(beers)) AS given FROM beer_transfers WHERE giver_id = $1"
+	giverQuery := "SELECT COALESCE(SUM(beers), 0) AS given FROM beer_transfers WHERE giver_id = $1"
 	err := r.db.GetContext(ctx, beerLog, giverQuery, userID)
 	if err != nil {
 		return nil, parseError(err)
 	}
 
-	receivedQuery := "SELECT COALESCE(SUM(beers)) AS received FROM beer_transfers WHERE taker_id = $1"
+	receivedQuery := "SELECT COALESCE(SUM(beers), 0) AS received FROM beer_transfers WHERE taker_id = $1"
 	err = r.db.GetContext(ctx, beerLog, receivedQuery, userID)
 	if err != nil {
 		return nil, parseError(err)
