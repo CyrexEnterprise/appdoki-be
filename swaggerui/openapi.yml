@@ -193,14 +193,15 @@ components:
       items:
         type: object
         properties:
-          giverId:
+          giver:
+            type: object
+            $ref: '#/components/schemas/User'
+          receiver:
+            type: object
+            $ref: '#/components/schemas/User'
+          givenAt:
             type: string
-          giverName:
-            type: string
-          receiverId:
-            type: string
-          receiverName:
-            type: string
+            format: date-time
           beers:
             type: number
     OAuthURL:

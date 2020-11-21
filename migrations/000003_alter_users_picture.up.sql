@@ -1,0 +1,3 @@
+UPDATE users SET picture = '' WHERE picture IS NULL;
+ALTER TABLE users ALTER COLUMN picture SET NOT NULL;
+ALTER TABLE users ALTER COLUMN picture SET DEFAULT '';
