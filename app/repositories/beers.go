@@ -2,19 +2,34 @@ package repositories
 
 import (
 	"context"
+	"fmt"
 	"github.com/jmoiron/sqlx"
 )
 
 type BeerTransferFeedItem struct {
-	Beers        int    `json:"beers"`
-	GivenAt      string `json:"givenAt" db:"given_at"`
-	Giver 		 User   `json:"giver"`
-	Receiver	 User   `json:"receiver"`
+	Beers    int    `json:"beers"`
+	GivenAt  string `json:"givenAt" db:"given_at"`
+	Giver    User   `json:"giver"`
+	Receiver User   `json:"receiver"`
+}
+
+type BeerFeedPaginationOptions struct {
+	Limit   int
+	GivenAt string
+	op      string
+}
+
+func (o *BeerFeedPaginationOptions) SetGtOperator() {
+	o.op = ">"
+}
+
+func (o *BeerFeedPaginationOptions) SetLtOperator() {
+	o.op = "<"
 }
 
 // BeersRepositoryInterface defines the set of User related methods available
 type BeersRepositoryInterface interface {
-	GetBeerTransfers(ctx context.Context) ([]BeerTransferFeedItem, error)
+	GetBeerTransfers(ctx context.Context, options *BeerFeedPaginationOptions) ([]BeerTransferFeedItem, error)
 }
 
 // BeersRepository implements UsersRepositoryInterface
@@ -27,8 +42,8 @@ func NewBeersRepository(db *sqlx.DB) *BeersRepository {
 	return &BeersRepository{db: db}
 }
 
-func (r *BeersRepository) GetBeerTransfers(ctx context.Context) ([]BeerTransferFeedItem, error) {
-	query := `
+func (r *BeersRepository) GetBeerTransfers(ctx context.Context, options *BeerFeedPaginationOptions) ([]BeerTransferFeedItem, error) {
+	baseQuery := `
 		SELECT giver.id,
 				giver.name,
 				giver.email,
@@ -42,8 +57,25 @@ func (r *BeersRepository) GetBeerTransfers(ctx context.Context) ([]BeerTransferF
 		FROM beer_transfers btf 
 		JOIN users giver ON giver.id = btf.giver_id 
 		JOIN users receiver ON receiver.id = btf.taker_id
-		ORDER BY btf.given_at DESC;`
-	rows, err := r.db.QueryxContext(ctx, query)
+	`
+
+	var whereClause string
+	var limitClause string
+
+	if len(options.GivenAt) > 0 {
+		limitClause = fmt.Sprintf(" LIMIT %d", options.Limit)
+		whereClause = fmt.Sprintf(" WHERE given_at %s $1", options.op)
+	}
+
+	query := fmt.Sprintf("%s %s ORDER BY btf.given_at DESC %s;", baseQuery, whereClause, limitClause)
+
+	var rows *sqlx.Rows
+	var err error
+	if len(options.GivenAt) > 0 {
+		rows, err = r.db.QueryxContext(ctx, query, options.GivenAt)
+	} else {
+		rows, err = r.db.QueryxContext(ctx, query)
+	}
 	if err != nil {
 		return nil, parseError(err)
 	}

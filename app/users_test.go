@@ -20,7 +20,7 @@ type mockUsersRepository struct {
 	deleteImpl             func(ctx context.Context, ID string) (bool, error)
 	addBeerTransferImpl    func(ctx context.Context, giverID string, takerID string, beers int) error
 	getBeerTransferLogImpl func(ctx context.Context, userID string) (*repositories.UserBeerLog, error)
-	clearTokensImpl		   func(ctx context.Context, ID string) error
+	clearTokensImpl        func(ctx context.Context, ID string) error
 }
 
 func (r *mockUsersRepository) GetAll(ctx context.Context) ([]*repositories.User, error) {

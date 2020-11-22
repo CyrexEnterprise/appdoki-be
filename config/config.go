@@ -9,19 +9,22 @@ import (
 
 // AppConfig contains API/business configurations
 type AppConfig struct {
-	OIDCProvider   *oidc.Provider
-	GoogleOauth    oauth2.Config
-	WebClientID	string
-	IOSClientID	string
-	AndroidClientID	string
-	RevokeEndpoint string
+	OIDCProvider    *oidc.Provider
+	GoogleOauth     oauth2.Config
+	WebClientID     string
+	IOSClientID     string
+	AndroidClientID string
+	RevokeEndpoint  string
 }
 
 func (c *AppConfig) GetPlatformClientID(platform string) string {
 	switch platform {
-	case "web": return c.WebClientID
-	case "ios": return c.IOSClientID
-	case "android": return c.AndroidClientID
+	case "web":
+		return c.WebClientID
+	case "ios":
+		return c.IOSClientID
+	case "android":
+		return c.AndroidClientID
 	}
 	return c.WebClientID
 }
@@ -56,10 +59,10 @@ func NewConfig() *Config {
 			Address: getEnv("ADDRESS", "localhost:4000"),
 		},
 		AppConfig: AppConfig{
-			OIDCProvider:   provider,
-			RevokeEndpoint: getEnv("GOOGLE_OIDC_REVOKE_URL", "https://oauth2.googleapis.com/revoke"),
-			WebClientID: os.Getenv("GOOGLE_OIDC_WEB_CLIENT_ID"),
-			IOSClientID: os.Getenv("GOOGLE_OIDC_IOS_CLIENT_ID"),
+			OIDCProvider:    provider,
+			RevokeEndpoint:  getEnv("GOOGLE_OIDC_REVOKE_URL", "https://oauth2.googleapis.com/revoke"),
+			WebClientID:     os.Getenv("GOOGLE_OIDC_WEB_CLIENT_ID"),
+			IOSClientID:     os.Getenv("GOOGLE_OIDC_IOS_CLIENT_ID"),
 			AndroidClientID: os.Getenv("GOOGLE_OIDC_ANDROID_CLIENT_ID"),
 			GoogleOauth: oauth2.Config{
 				ClientID:     os.Getenv("GOOGLE_OAUTH_CLIENT_ID"),

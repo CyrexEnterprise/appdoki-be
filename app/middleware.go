@@ -52,9 +52,9 @@ func loggingMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-const(
-	Web = "web"
-	IOS = "ios"
+const (
+	Web     = "web"
+	IOS     = "ios"
 	Android = "Android"
 )
 
