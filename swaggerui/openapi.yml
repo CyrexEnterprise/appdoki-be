@@ -108,7 +108,7 @@ paths:
   /beers:
     get:
       tags: [ beers ]
-      description: Returns a beer transference feed
+      description: Returns the beer transfers feed
       security:
         - bearerAuth: [ ]
       parameters:
