@@ -1,6 +1,6 @@
 # appdoki-be
 
-This repository contains the RESTful API that serves our in-house build application.
+This repository contains the RESTful API server used by our [in-house built company application](https://github.com/Cloudoki/appdoki-rn).
 
 This project, besides having functional expectations, also aims at being a locomotive for technical experiments.
 
