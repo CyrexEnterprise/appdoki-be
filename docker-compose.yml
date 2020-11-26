@@ -18,6 +18,8 @@ services:
       - GOOGLE_OIDC_IOS_CLIENT_ID=${GOOGLE_OIDC_IOS_CLIENT_ID}
       - GOOGLE_OIDC_ANDROID_CLIENT_ID=${GOOGLE_OIDC_ANDROID_CLIENT_ID}
       - GOOGLE_SERVICE_ACCOUNT_KEY=${GOOGLE_SERVICE_ACCOUNT_KEY}
+    volumes:
+      - './certs:/root/app/certs'
   postgresql:
     container_name: appdoki-db
     image: postgres:13
