@@ -2,6 +2,7 @@ package app
 
 import (
 	"appdoki-be/app/repositories"
+	"context"
 	"encoding/json"
 	"firebase.google.com/go/v4/messaging"
 	"fmt"
@@ -222,11 +223,11 @@ func (h *UsersHandler) GiveBeers(w http.ResponseWriter, r *http.Request) {
 	}
 
 	go func() {
-		giver, err := h.userRepo.FindByID(r.Context(), userID)
+		giver, err := h.userRepo.FindByID(context.Background(), userID)
 		if err != nil {
 			log.Error("error getting giver: ", err)
 		}
-		receiver, err := h.userRepo.FindByID(r.Context(), takerUserId)
+		receiver, err := h.userRepo.FindByID(context.Background(), takerUserId)
 		if err != nil {
 			log.Errorln("error getting receiver: ", err)
 		}
