@@ -222,8 +222,14 @@ func (h *UsersHandler) GiveBeers(w http.ResponseWriter, r *http.Request) {
 	}
 
 	go func() {
-		giver, _ := h.userRepo.FindByID(r.Context(), userID)
-		receiver, _ := h.userRepo.FindByID(r.Context(), takerUserId)
+		giver, err := h.userRepo.FindByID(r.Context(), userID)
+		if err != nil {
+			log.Error("error getting giver: ", err)
+		}
+		receiver, err := h.userRepo.FindByID(r.Context(), takerUserId)
+		if err != nil {
+			log.Errorln("error getting receiver: ", err)
+		}
 
 		if giver == nil || receiver == nil {
 			log.Warn("could not fetch users for beers notification")
