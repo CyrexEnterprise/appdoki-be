@@ -16,7 +16,7 @@ type User struct {
 
 type UserBeerLog struct {
 	Given    int `json:"given" db:"given"`
-	Received int `json:"received " db:"received"`
+	Received int `json:"received" db:"received"`
 }
 
 // UsersRepositoryInterface defines the set of User related methods available
