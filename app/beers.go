@@ -40,12 +40,15 @@ func (h *BeersHandler) Get(w http.ResponseWriter, r *http.Request) {
 		options.GivenAt = givenAt
 
 		switch r.URL.Query().Get("op") {
-		case "gt": options.SetGtOperator()
-		case "lt": options.SetLtOperator()
-		default: options.SetGtOperator()
+		case "gt":
+			options.SetGtOperator()
+		case "lt":
+			options.SetLtOperator()
+		default:
+			options.SetGtOperator()
 		}
 	}
-	
+
 	feed, err := h.beersRepo.GetBeerTransfers(r.Context(), options)
 	if err != nil {
 		respondInternalError(w)

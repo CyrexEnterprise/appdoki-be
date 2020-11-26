@@ -3,8 +3,10 @@ package app
 import (
 	"appdoki-be/app/repositories"
 	"encoding/json"
+	"firebase.google.com/go/v4/messaging"
 	"fmt"
 	"github.com/gorilla/mux"
+	log "github.com/sirupsen/logrus"
 	"net/http"
 	"strconv"
 )
@@ -31,12 +33,14 @@ func (p *CreateUserPayload) validate() []string {
 // UsersHandler holds handler dependencies
 type UsersHandler struct {
 	userRepo repositories.UsersRepositoryInterface
+	notifier notifier
 }
 
 // NewUsersHandler returns an initialized users handler with the required dependencies
-func NewUsersHandler(userRepo repositories.UsersRepositoryInterface) *UsersHandler {
+func NewUsersHandler(userRepo repositories.UsersRepositoryInterface, notifierSrv notifier) *UsersHandler {
 	return &UsersHandler{
 		userRepo: userRepo,
+		notifier: notifierSrv,
 	}
 }
 
@@ -216,6 +220,21 @@ func (h *UsersHandler) GiveBeers(w http.ResponseWriter, r *http.Request) {
 		respondInternalError(w)
 		return
 	}
+
+	go func() {
+		giver, _ := h.userRepo.FindByID(r.Context(), userID)
+		receiver, _ := h.userRepo.FindByID(r.Context(), takerUserId)
+
+		if giver == nil || receiver == nil {
+			log.Warn("could not fetch users for beers notification")
+			return
+		}
+
+		h.notifier.notifyAll(beersTopic, messaging.Notification{
+			Title: "BeerTab event",
+			Body:  fmt.Sprintf("%s just rewarded %s with %n beers!", giver.Name, receiver.Name, beers),
+		})
+	}()
 
 	respondNoContent(w, http.StatusNoContent)
 }

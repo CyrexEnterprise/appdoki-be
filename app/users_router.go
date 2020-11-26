@@ -2,11 +2,16 @@ package app
 
 import (
 	"github.com/gorilla/mux"
+	log "github.com/sirupsen/logrus"
 	"net/http"
 )
 
 func (a *Application) UsersRouter(router *mux.Router) {
-	usersHandler := NewUsersHandler(a.usersRepository)
+	notifierSrv, err := newNotifier(a.firebaseApp)
+	if err != nil {
+		log.Fatal("could not instantiate a notifier")
+	}
+	usersHandler := NewUsersHandler(a.usersRepository, notifierSrv)
 
 	router.
 		Methods(http.MethodGet).
@@ -27,9 +32,4 @@ func (a *Application) UsersRouter(router *mux.Router) {
 		Methods(http.MethodPost).
 		Path("/users/{id}/beers/{beers}").
 		HandlerFunc(a.JwtVerify(usersHandler.GiveBeers))
-
-	//router.
-	//	Methods(http.MethodPut).
-	//	Path("/{id}").
-	//	HandlerFunc(usersHandler.Update)
 }

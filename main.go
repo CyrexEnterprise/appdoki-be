@@ -4,9 +4,11 @@ import (
 	"appdoki-be/app"
 	"appdoki-be/config"
 	"context"
+	firebase "firebase.google.com/go/v4"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	log "github.com/sirupsen/logrus"
+	"google.golang.org/api/option"
 	"net/http"
 	"os"
 	"os/signal"
@@ -16,10 +18,9 @@ import (
 
 func main() {
 	conf := config.NewConfig()
-
+	firebaseApp := prepareFirebaseApp(conf.AppConfig.GoogleServiceAccountKeyPath)
 	db := prepareDatabase(&conf.Database)
-
-	application := app.NewApplication(conf, db)
+	application := app.NewApplication(conf, db, firebaseApp)
 
 	srv := &http.Server{
 		Addr:         conf.Server.Address,
@@ -62,4 +63,14 @@ func prepareDatabase(conf *config.DatabaseConfig) *sqlx.DB {
 	runMigrations(db.DB, conf)
 
 	return db
+}
+
+func prepareFirebaseApp(keyPath string) *firebase.App {
+	opt := option.WithCredentialsFile(keyPath)
+	firebaseApp, err := firebase.NewApp(context.Background(), nil, opt)
+	if err != nil {
+		log.Fatal("error initializing app: %v", err)
+	}
+
+	return firebaseApp
 }

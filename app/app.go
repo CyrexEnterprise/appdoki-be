@@ -3,6 +3,7 @@ package app
 import (
 	"appdoki-be/app/repositories"
 	"appdoki-be/config"
+	firebase "firebase.google.com/go/v4"
 	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
 	"net/http"
@@ -10,13 +11,15 @@ import (
 
 type Application struct {
 	conf            *config.Config
+	firebaseApp     *firebase.App
 	usersRepository repositories.UsersRepositoryInterface
 	beersRepository repositories.BeersRepositoryInterface
 }
 
-func NewApplication(conf *config.Config, db *sqlx.DB) *Application {
+func NewApplication(conf *config.Config, db *sqlx.DB, firebaseApp *firebase.App) *Application {
 	return &Application{
 		conf:            conf,
+		firebaseApp:     firebaseApp,
 		usersRepository: repositories.NewUsersRepository(db),
 		beersRepository: repositories.NewBeersRepository(db),
 	}
@@ -42,10 +45,26 @@ func (a *Application) Routes() http.Handler {
 }
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
-	type homeResponse struct {
-		DocsEndpoint string
+	type TopicInfo struct {
+		Topic       string
+		Description string
 	}
-	respondJSON(w, homeResponse{
+	type homeResponse struct {
+		Version         string
+		DocsEndpoint    string
+		MessagingTopics []TopicInfo
+	}
+
+	res := homeResponse{
+		Version:      "1.0.0",
 		DocsEndpoint: "/docs/",
-	}, http.StatusOK)
+		MessagingTopics: []TopicInfo{
+			{
+				Topic:       "beers",
+				Description: "Global beer transfer notifications",
+			},
+		},
+	}
+
+	respondJSON(w, res, http.StatusOK)
 }
