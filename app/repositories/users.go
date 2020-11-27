@@ -46,7 +46,7 @@ func NewUsersRepository(db *sqlx.DB) *UsersRepository {
 // GetAll fetches all users, returns an empty slice if no user exists
 func (r *UsersRepository) GetAll(ctx context.Context) ([]*User, error) {
 	users := []*User{}
-	err := r.db.SelectContext(ctx, &users, "SELECT id, name, email FROM users")
+	err := r.db.SelectContext(ctx, &users, "SELECT id, name, email, picture FROM users")
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func (r *UsersRepository) GetAll(ctx context.Context) ([]*User, error) {
 // FindByID finds a user by ID, returns nil if not found
 func (r *UsersRepository) FindByID(ctx context.Context, ID string) (*User, error) {
 	user := &User{}
-	err := r.db.GetContext(ctx, user, "SELECT id, name, email FROM users WHERE id = $1", ID)
+	err := r.db.GetContext(ctx, user, "SELECT id, name, email, picture FROM users WHERE id = $1", ID)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
@@ -70,7 +70,7 @@ func (r *UsersRepository) FindByID(ctx context.Context, ID string) (*User, error
 // FindByEmail finds a user by email, returns nil if not found
 func (r *UsersRepository) FindByEmail(ctx context.Context, email string) (*User, error) {
 	user := &User{}
-	stmt := "SELECT id, name, email FROM users WHERE email = $1"
+	stmt := "SELECT id, name, email, picture FROM users WHERE email = $1"
 	err := r.db.GetContext(ctx, user, stmt, email)
 	if err != nil {
 		if err == sql.ErrNoRows {
