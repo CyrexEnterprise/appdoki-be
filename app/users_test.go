@@ -4,6 +4,7 @@ import (
 	"appdoki-be/app/repositories"
 	"context"
 	"encoding/json"
+	"firebase.google.com/go/v4/messaging"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -14,7 +15,7 @@ type mockUsersRepository struct {
 	getAllImpl             func(ctx context.Context) ([]*repositories.User, error)
 	findByIDImpl           func(ctx context.Context, ID string) (*repositories.User, error)
 	findByEmailImpl        func(ctx context.Context, email string) (*repositories.User, error)
-	findOrCreateUserImpl   func(ctx context.Context, userData *repositories.User) (*repositories.User, error)
+	findOrCreateUserImpl   func(ctx context.Context, userData *repositories.User) (*repositories.User, bool, error)
 	createImpl             func(ctx context.Context, user *repositories.User) (*repositories.User, error)
 	updateImpl             func(ctx context.Context, user *repositories.User) (*repositories.User, error)
 	deleteImpl             func(ctx context.Context, ID string) (bool, error)
@@ -39,7 +40,7 @@ func (r *mockUsersRepository) Create(ctx context.Context, user *repositories.Use
 	return r.createImpl(ctx, user)
 }
 
-func (r *mockUsersRepository) FindOrCreateUser(ctx context.Context, userData *repositories.User) (*repositories.User, error) {
+func (r *mockUsersRepository) FindOrCreateUser(ctx context.Context, userData *repositories.User) (*repositories.User, bool, error) {
 	return r.findOrCreateUserImpl(ctx, userData)
 }
 
@@ -81,8 +82,8 @@ func getDefaultMockUsersRepository() *mockUsersRepository {
 		findByEmailImpl: func(ctx context.Context, email string) (*repositories.User, error) {
 			return mockUser, nil
 		},
-		findOrCreateUserImpl: func(ctx context.Context, user *repositories.User) (*repositories.User, error) {
-			return mockUser, nil
+		findOrCreateUserImpl: func(ctx context.Context, user *repositories.User) (*repositories.User, bool, error) {
+			return mockUser, true, nil
 		},
 		createImpl: func(ctx context.Context, user *repositories.User) (*repositories.User, error) {
 			return mockUser, nil
@@ -96,9 +97,17 @@ func getDefaultMockUsersRepository() *mockUsersRepository {
 	}
 }
 
+type mockNotifier struct{}
+
+func (n *mockNotifier) notifyAll(_ string, _ messaging.Notification) {}
+
+func getMockNotifier() *mockNotifier {
+	return &mockNotifier{}
+}
+
 func TestUsersHandler_Get(t *testing.T) {
 	t.Run("expect GET /users to return 200 and a list of users", func(t *testing.T) {
-		uh := NewUsersHandler(getDefaultMockUsersRepository())
+		uh := NewUsersHandler(getDefaultMockUsersRepository(), getMockNotifier())
 
 		r := httptest.NewRequest("GET", "/users", nil)
 		w := httptest.NewRecorder()
@@ -127,7 +136,7 @@ func TestUsersHandler_Get(t *testing.T) {
 		mock.getAllImpl = func(_ context.Context) ([]*repositories.User, error) {
 			return []*repositories.User{}, nil
 		}
-		uh := NewUsersHandler(mock)
+		uh := NewUsersHandler(mock, getMockNotifier())
 
 		r := httptest.NewRequest("GET", "/users", nil)
 		w := httptest.NewRecorder()

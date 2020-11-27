@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -24,7 +25,7 @@ type UsersRepositoryInterface interface {
 	GetAll(ctx context.Context) ([]*User, error)
 	FindByID(ctx context.Context, ID string) (*User, error)
 	FindByEmail(ctx context.Context, email string) (*User, error)
-	FindOrCreateUser(ctx context.Context, userData *User) (*User, error)
+	FindOrCreateUser(ctx context.Context, userData *User) (*User, bool, error)
 	Create(ctx context.Context, user *User) (*User, error)
 	Update(ctx context.Context, user *User) (*User, error)
 	Delete(ctx context.Context, ID string) (bool, error)
@@ -82,11 +83,12 @@ func (r *UsersRepository) FindByEmail(ctx context.Context, email string) (*User,
 }
 
 // FindOrCreateUser finds a user by ID and creates it if not found
+// returns a boolean indicating if the user was created
 // TODO deal with passing txn around
-func (r *UsersRepository) FindOrCreateUser(ctx context.Context, userData *User) (*User, error) {
+func (r *UsersRepository) FindOrCreateUser(ctx context.Context, userData *User) (*User, bool, error) {
 	tx, err := r.db.BeginTxx(ctx, nil)
 	if err != nil {
-		return nil, err
+		return nil, false, err
 	}
 	defer tx.Rollback()
 
@@ -94,35 +96,35 @@ func (r *UsersRepository) FindOrCreateUser(ctx context.Context, userData *User) 
 	selectStmt := "SELECT id, name, email, picture FROM users WHERE id = $1"
 	err = tx.GetContext(ctx, user, selectStmt, userData.ID)
 	if err == nil {
-		return user, nil
+		return user, false, nil
 	}
 	if err != sql.ErrNoRows {
-		return nil, parseError(err)
+		return nil, false, parseError(err)
 	}
 
 	insertStmt := "INSERT INTO users (id, name, email, picture) VALUES ($1, $2, $3, $4) RETURNING id"
 	res, err := tx.ExecContext(ctx, insertStmt, userData.ID, userData.Name, userData.Email, userData.Picture)
 	if err != nil {
-		return nil, parseError(err)
+		return nil, false, parseError(err)
 	}
 
 	if rows, err := res.RowsAffected(); err != nil {
 		if rows == 0 {
-			return nil, nil
+			return nil, false, errors.New("could not create user")
 		}
-		return nil, parseError(err)
+		return nil, false, parseError(err)
 	}
 
 	err = tx.GetContext(ctx, user, selectStmt, userData.ID)
 	if err != nil {
-		return nil, parseError(err)
+		return nil, false, parseError(err)
 	}
 
 	if err := tx.Commit(); err != nil {
-		return nil, parseError(err)
+		return nil, false, parseError(err)
 	}
 
-	return user, nil
+	return user, true, nil
 }
 
 // Create creates a new user, returning the full model

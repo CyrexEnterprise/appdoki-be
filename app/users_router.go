@@ -2,16 +2,11 @@ package app
 
 import (
 	"github.com/gorilla/mux"
-	log "github.com/sirupsen/logrus"
 	"net/http"
 )
 
 func (a *Application) UsersRouter(router *mux.Router) {
-	notifierSrv, err := newNotifier(a.firebaseApp)
-	if err != nil {
-		log.Fatal("could not instantiate a notifier")
-	}
-	usersHandler := NewUsersHandler(a.usersRepository, notifierSrv)
+	usersHandler := NewUsersHandler(a.usersRepository, a.notifier)
 
 	router.
 		Methods(http.MethodGet).

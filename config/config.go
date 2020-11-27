@@ -67,7 +67,7 @@ func NewConfig() *Config {
 			AndroidClientID:             os.Getenv("GOOGLE_OIDC_ANDROID_CLIENT_ID"),
 			GoogleServiceAccountKeyPath: os.Getenv("GOOGLE_SERVICE_ACCOUNT_KEY"),
 			GoogleOauth: oauth2.Config{
-				ClientID:     os.Getenv("GOOGLE_OAUTH_CLIENT_ID"),
+				ClientID:     os.Getenv("GOOGLE_OIDC_WEB_CLIENT_ID"),
 				ClientSecret: os.Getenv("GOOGLE_OAUTH_CLIENT_SECRET"),
 				Endpoint:     provider.Endpoint(),
 				RedirectURL:  os.Getenv("GOOGLE_OAUTH_REDIRECT_URL"),

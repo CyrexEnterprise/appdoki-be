@@ -19,6 +19,7 @@ import (
 type AuthHandler struct {
 	appConfig config.AppConfig
 	userRepo  repositories.UsersRepositoryInterface
+	notifier  notifier
 }
 
 type AuthCodePayload struct {
@@ -30,10 +31,14 @@ type TokenPayload struct {
 }
 
 // NewOAuthHandler returns an initialized users handler with the required dependencies
-func NewAuthHandler(appConfig config.AppConfig, userRepo repositories.UsersRepositoryInterface) *AuthHandler {
+func NewAuthHandler(
+	appConfig config.AppConfig,
+	userRepo repositories.UsersRepositoryInterface,
+	notifierSrv notifier) *AuthHandler {
 	return &AuthHandler{
 		appConfig: appConfig,
 		userRepo:  userRepo,
+		notifier:  notifierSrv,
 	}
 }
 
@@ -112,7 +117,7 @@ func (h *AuthHandler) Token(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = h.userRepo.FindOrCreateUser(r.Context(), &repositories.User{
+	_, _, err = h.userRepo.FindOrCreateUser(r.Context(), &repositories.User{
 		ID:      idToken.Subject,
 		Name:    idTokenClaims.Name,
 		Email:   idTokenClaims.Email,
@@ -165,7 +170,7 @@ func (h *AuthHandler) Callback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = h.userRepo.FindOrCreateUser(r.Context(), &repositories.User{
+	_, _, err = h.userRepo.FindOrCreateUser(r.Context(), &repositories.User{
 		ID:      idToken.Subject,
 		Name:    idTokenClaims.Name,
 		Email:   idTokenClaims.Email,
@@ -225,12 +230,23 @@ func (h *AuthHandler) FindCreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := h.userRepo.FindOrCreateUser(r.Context(), &repositories.User{
+	user, created, err := h.userRepo.FindOrCreateUser(r.Context(), &repositories.User{
 		ID:      idToken.Subject,
 		Name:    idTokenClaims.Name,
 		Email:   idTokenClaims.Email,
 		Picture: idTokenClaims.Picture,
 	})
+
+	if created == true && user != nil {
+		go func() {
+			h.notifier.messageAll(usersTopic, map[string]string{
+				"id":   user.ID,
+				"name": user.Name,
+				"email":   user.Email,
+				"picture": user.Picture,
+			})
+		}()
+	}
 
 	respondJSON(w, user, http.StatusOK)
 }

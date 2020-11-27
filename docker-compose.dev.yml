@@ -4,7 +4,7 @@ services:
     container_name: appdoki-api
     build: .
     ports:
-      - "4000:4000"
+      - "4001:4000"
     depends_on:
       - postgresql
     environment:

@@ -6,6 +6,7 @@ import (
 	firebase "firebase.google.com/go/v4"
 	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
+	log "github.com/sirupsen/logrus"
 	"net/http"
 )
 
@@ -14,14 +15,21 @@ type Application struct {
 	firebaseApp     *firebase.App
 	usersRepository repositories.UsersRepositoryInterface
 	beersRepository repositories.BeersRepositoryInterface
+	notifier        notifier
 }
 
 func NewApplication(conf *config.Config, db *sqlx.DB, firebaseApp *firebase.App) *Application {
+	notifierSrv, err := newNotifier(firebaseApp)
+	if err != nil {
+		log.Fatal("could not instantiate a notifier")
+	}
+
 	return &Application{
 		conf:            conf,
 		firebaseApp:     firebaseApp,
 		usersRepository: repositories.NewUsersRepository(db),
 		beersRepository: repositories.NewBeersRepository(db),
+		notifier:        notifierSrv,
 	}
 }
 

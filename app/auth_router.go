@@ -6,7 +6,7 @@ import (
 )
 
 func (a *Application) AuthRouter(router *mux.Router) {
-	authHandler := NewAuthHandler(a.conf.AppConfig, a.usersRepository)
+	authHandler := NewAuthHandler(a.conf.AppConfig, a.usersRepository, a.notifier)
 
 	router.
 		Methods(http.MethodGet).
@@ -19,10 +19,10 @@ func (a *Application) AuthRouter(router *mux.Router) {
 		Path("/auth/google/callback").
 		HandlerFunc(authHandler.Callback)
 
-	router.
-		Methods(http.MethodGet).
-		Path("/auth/token").
-		HandlerFunc(authHandler.Token)
+	//router.
+	//	Methods(http.MethodGet).
+	//	Path("/auth/token").
+	//	HandlerFunc(authHandler.Token)
 
 	router.
 		Methods(http.MethodPost).

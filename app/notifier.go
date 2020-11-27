@@ -8,6 +8,7 @@ import (
 )
 
 const beersTopic = "beers"
+const usersTopic = "users"
 
 type notifyService struct {
 	client *messaging.Client
@@ -15,6 +16,7 @@ type notifyService struct {
 
 type notifier interface {
 	notifyAll(topic string, content messaging.Notification)
+	messageAll(topic string, content map[string]string)
 }
 
 func newNotifier(app *firebase.App) (*notifyService, error) {
@@ -29,14 +31,23 @@ func newNotifier(app *firebase.App) (*notifyService, error) {
 }
 
 func (n *notifyService) notifyAll(topic string, content messaging.Notification) {
-	message := &messaging.Message{
+	n.sendMessage(&messaging.Message{
 		Notification: &content,
 		Topic:        topic,
-	}
+	})
+}
 
+func (n *notifyService) messageAll(topic string, content map[string]string) {
+	n.sendMessage(&messaging.Message{
+		Data:  content,
+		Topic: topic,
+	})
+}
+
+func (n *notifyService) sendMessage(message *messaging.Message) {
 	response, err := n.client.Send(context.Background(), message)
 	if err != nil {
-		log.Errorf("error sending message to topic %s: %v\n", topic, err)
+		log.Errorf("error sending message to topic %s: %v\n", message.Topic, err)
 	}
 
 	log.Infof("successfully sent message with id %s", response)
