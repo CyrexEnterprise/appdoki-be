@@ -71,6 +71,10 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 				Topic:       "beers",
 				Description: "Global beer transfer notifications",
 			},
+			{
+				Topic:       "users",
+				Description: "Global notification for joined users",
+			},
 		},
 	}
 
