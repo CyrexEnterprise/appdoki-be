@@ -66,107 +66,13 @@ func (h *UsersHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	uid, ok := vars["id"]
 	if !ok {
-		respondJSON(w, &appError{
-			Errors: []string{"invalid id param"},
-		}, http.StatusBadRequest)
+		log.Error("could not read id param in UsersHandler.GetByID")
+		respondInternalError(w)
 		return
 	}
 
 	user, err := h.userRepo.FindByID(r.Context(), uid)
 	if err != nil {
-		respondInternalError(w)
-		return
-	}
-
-	if user == nil {
-		respondJSON(w, &appError{
-			Errors: []string{"user not found"},
-		}, http.StatusNotFound)
-		return
-	}
-
-	respondJSON(w, user, http.StatusOK)
-}
-
-// Create creates a new user
-func (h *UsersHandler) Create(w http.ResponseWriter, r *http.Request) {
-	decoder := json.NewDecoder(r.Body)
-
-	var userPayload CreateUserPayload
-	err := decoder.Decode(&userPayload)
-	if err != nil {
-		respondInternalError(w)
-		return
-	}
-
-	errs := userPayload.validate()
-	if errs != nil {
-		respondJSON(w, &appError{
-			Errors: errs,
-		}, http.StatusBadRequest)
-		return
-	}
-
-	user, err := h.userRepo.Create(r.Context(), &repositories.User{
-		Name:  userPayload.Name,
-		Email: userPayload.Email,
-	})
-	if err != nil {
-		if e, ok := err.(*repositories.ConflictError); ok {
-			respondJSON(w, &appError{
-				Errors: []string{e.Message},
-			}, http.StatusConflict)
-			return
-		}
-
-		respondInternalError(w)
-		return
-	}
-
-	respondJSON(w, user, http.StatusCreated)
-}
-
-// Update updates a user
-func (h *UsersHandler) Update(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	uid, ok := vars["id"]
-	if !ok {
-		respondJSON(w, &appError{
-			Errors: []string{"invalid id param"},
-		}, http.StatusBadRequest)
-		return
-	}
-
-	decoder := json.NewDecoder(r.Body)
-
-	var userPayload CreateUserPayload
-	err := decoder.Decode(&userPayload)
-	if err != nil {
-		respondInternalError(w)
-		return
-	}
-
-	errs := userPayload.validate()
-	if errs != nil {
-		respondJSON(w, &appError{
-			Errors: errs,
-		}, http.StatusBadRequest)
-		return
-	}
-
-	user, err := h.userRepo.Update(r.Context(), &repositories.User{
-		ID:    uid,
-		Name:  userPayload.Name,
-		Email: userPayload.Email,
-	})
-	if err != nil {
-		if e, ok := err.(*repositories.ConflictError); ok {
-			respondJSON(w, &appError{
-				Errors: []string{e.Message},
-			}, http.StatusConflict)
-			return
-		}
-
 		respondInternalError(w)
 		return
 	}
@@ -187,9 +93,8 @@ func (h *UsersHandler) GiveBeers(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	takerUserId, ok := vars["id"]
 	if !ok {
-		respondJSON(w, &appError{
-			Errors: []string{"invalid id param"},
-		}, http.StatusBadRequest)
+		log.Error("could not read id param in UsersHandler.GiveBeers")
+		respondInternalError(w)
 		return
 	}
 
@@ -202,15 +107,16 @@ func (h *UsersHandler) GiveBeers(w http.ResponseWriter, r *http.Request) {
 
 	beersParam, ok := vars["beers"]
 	if !ok {
-		respondJSON(w, &appError{
-			Errors: []string{"invalid beers param"},
-		}, http.StatusBadRequest)
+		log.Error("could not read beers param in UsersHandler.GiveBeers")
+		respondInternalError(w)
 		return
 	}
 
 	beers, err := strconv.Atoi(beersParam)
 	if err != nil {
-		respondInternalError(w)
+		respondJSON(w, &appError{
+			Errors: []string{"invalid beers param: number expected"},
+		}, http.StatusBadRequest)
 		return
 	}
 
@@ -258,9 +164,8 @@ func (h *UsersHandler) BeersSummary(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	userID, ok := vars["id"]
 	if !ok {
-		respondJSON(w, &appError{
-			Errors: []string{"invalid id param"},
-		}, http.StatusBadRequest)
+		log.Error("could not read id param in UsersHandler.BeersSummary")
+		respondInternalError(w)
 		return
 	}
 

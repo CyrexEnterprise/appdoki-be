@@ -99,3 +99,13 @@ func generateRandomUserMock() *repos.User {
 		Picture: gofakeit.URL(),
 	}
 }
+
+func generateRandomUserMockWithID(id string) *repos.User {
+	gofakeit.Seed(0)
+	return &repos.User{
+		ID:      id,
+		Name:    gofakeit.Name(),
+		Email:   gofakeit.Email(),
+		Picture: gofakeit.URL(),
+	}
+}
