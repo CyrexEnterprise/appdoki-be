@@ -49,7 +49,7 @@ func main() {
 	}()
 
 	if err := srv.Shutdown(ctx); err != nil {
-		log.Fatalf("Server shutdown failed:%+v", err)
+		log.Fatalf("Server shutdown failed: %+v", err)
 	}
 	log.Info("Server exited gracefully")
 }
@@ -69,7 +69,7 @@ func prepareFirebaseApp(keyPath string) *firebase.App {
 	opt := option.WithCredentialsFile(keyPath)
 	firebaseApp, err := firebase.NewApp(context.Background(), nil, opt)
 	if err != nil {
-		log.Fatal("error initializing app: %v", err)
+		log.Fatalf("error initializing app: %+v", err)
 	}
 
 	return firebaseApp

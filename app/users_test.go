@@ -11,92 +11,6 @@ import (
 	"testing"
 )
 
-type mockUsersRepository struct {
-	getAllImpl             func(ctx context.Context) ([]*repositories.User, error)
-	findByIDImpl           func(ctx context.Context, ID string) (*repositories.User, error)
-	findByEmailImpl        func(ctx context.Context, email string) (*repositories.User, error)
-	findOrCreateUserImpl   func(ctx context.Context, userData *repositories.User) (*repositories.User, bool, error)
-	createImpl             func(ctx context.Context, user *repositories.User) (*repositories.User, error)
-	updateImpl             func(ctx context.Context, user *repositories.User) (*repositories.User, error)
-	deleteImpl             func(ctx context.Context, ID string) (bool, error)
-	addBeerTransferImpl    func(ctx context.Context, giverID string, takerID string, beers int) (int, error)
-	getBeerTransferLogImpl func(ctx context.Context, userID string) (*repositories.UserBeerLog, error)
-	clearTokensImpl        func(ctx context.Context, ID string) error
-}
-
-func (r *mockUsersRepository) GetAll(ctx context.Context) ([]*repositories.User, error) {
-	return r.getAllImpl(ctx)
-}
-
-func (r *mockUsersRepository) FindByID(ctx context.Context, ID string) (*repositories.User, error) {
-	return r.findByIDImpl(ctx, ID)
-}
-
-func (r *mockUsersRepository) FindByEmail(ctx context.Context, email string) (*repositories.User, error) {
-	return r.findByEmailImpl(ctx, email)
-}
-
-func (r *mockUsersRepository) Create(ctx context.Context, user *repositories.User) (*repositories.User, error) {
-	return r.createImpl(ctx, user)
-}
-
-func (r *mockUsersRepository) FindOrCreateUser(ctx context.Context, userData *repositories.User) (*repositories.User, bool, error) {
-	return r.findOrCreateUserImpl(ctx, userData)
-}
-
-func (r *mockUsersRepository) Update(ctx context.Context, user *repositories.User) (*repositories.User, error) {
-	return r.updateImpl(ctx, user)
-}
-
-func (r *mockUsersRepository) Delete(ctx context.Context, ID string) (bool, error) {
-	return r.deleteImpl(ctx, ID)
-}
-
-func (r *mockUsersRepository) AddBeerTransfer(ctx context.Context, giverID string, takerID string, beers int) (int, error) {
-	return r.addBeerTransferImpl(ctx, giverID, takerID, beers)
-}
-
-func (r *mockUsersRepository) GetBeerTransfersSummary(ctx context.Context, userID string) (*repositories.UserBeerLog, error) {
-	return r.getBeerTransferLogImpl(ctx, userID)
-}
-
-func (r *mockUsersRepository) ClearTokens(ctx context.Context, ID string) error {
-	return r.clearTokensImpl(ctx, ID)
-}
-
-func getDefaultMockUsersRepository() *mockUsersRepository {
-	mockUser := &repositories.User{
-		ID:    "1",
-		Name:  "Roger Rabbit",
-		Email: "rrabbit@acme.com",
-	}
-
-	return &mockUsersRepository{
-		getAllImpl: func(_ context.Context) ([]*repositories.User, error) {
-			mockUsers := []*repositories.User{mockUser}
-			return mockUsers, nil
-		},
-		findByIDImpl: func(ctx context.Context, ID string) (*repositories.User, error) {
-			return mockUser, nil
-		},
-		findByEmailImpl: func(ctx context.Context, email string) (*repositories.User, error) {
-			return mockUser, nil
-		},
-		findOrCreateUserImpl: func(ctx context.Context, user *repositories.User) (*repositories.User, bool, error) {
-			return mockUser, true, nil
-		},
-		createImpl: func(ctx context.Context, user *repositories.User) (*repositories.User, error) {
-			return mockUser, nil
-		},
-		updateImpl: func(ctx context.Context, user *repositories.User) (*repositories.User, error) {
-			return mockUser, nil
-		},
-		deleteImpl: func(ctx context.Context, ID string) (bool, error) {
-			return true, nil
-		},
-	}
-}
-
 type mockNotifier struct{}
 
 func (n *mockNotifier) notifyAll(_ string, _ *messaging.Notification, _ map[string]string) {}
@@ -108,7 +22,10 @@ func getMockNotifier() *mockNotifier {
 
 func TestUsersHandler_Get(t *testing.T) {
 	t.Run("expect GET /users to return 200 and a list of users", func(t *testing.T) {
-		uh := NewUsersHandler(getDefaultMockUsersRepository(), getMockNotifier())
+		uh := NewUsersHandler(
+			getDefaultMockUsersRepository(),
+			getDefaultMockBeersRepository(),
+			getMockNotifier())
 
 		r := httptest.NewRequest("GET", "/users", nil)
 		w := httptest.NewRecorder()
@@ -137,7 +54,7 @@ func TestUsersHandler_Get(t *testing.T) {
 		mock.getAllImpl = func(_ context.Context) ([]*repositories.User, error) {
 			return []*repositories.User{}, nil
 		}
-		uh := NewUsersHandler(mock, getMockNotifier())
+		uh := NewUsersHandler(mock, getDefaultMockBeersRepository(), getMockNotifier())
 
 		r := httptest.NewRequest("GET", "/users", nil)
 		w := httptest.NewRecorder()

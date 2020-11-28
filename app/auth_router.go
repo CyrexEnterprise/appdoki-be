@@ -8,12 +8,13 @@ import (
 func (a *Application) AuthRouter(router *mux.Router) {
 	authHandler := NewAuthHandler(a.conf.AppConfig, a.usersRepository, a.notifier)
 
+	// for local testing purposes
 	router.
 		Methods(http.MethodGet).
 		Path("/auth/login").
 		HandlerFunc(authHandler.Login)
 
-	// for testing purposes
+	// for local testing purposes
 	router.
 		Methods(http.MethodGet).
 		Path("/auth/google/callback").
@@ -23,11 +24,6 @@ func (a *Application) AuthRouter(router *mux.Router) {
 	//	Methods(http.MethodGet).
 	//	Path("/auth/token").
 	//	HandlerFunc(authHandler.Token)
-
-	router.
-		Methods(http.MethodPost).
-		Path("/auth/revoke").
-		HandlerFunc(a.JwtVerify(authHandler.Revoke))
 
 	router.
 		Methods(http.MethodGet).

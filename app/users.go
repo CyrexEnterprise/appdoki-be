@@ -33,9 +33,9 @@ func (p *CreateUserPayload) validate() []string {
 
 // UsersHandler holds handler dependencies
 type UsersHandler struct {
-	userRepo repositories.UsersRepositoryInterface
+	userRepo  repositories.UsersRepositoryInterface
 	beersRepo repositories.BeersRepositoryInterface
-	notifier notifier
+	notifier  notifier
 }
 
 // NewUsersHandler returns an initialized users handler with the required dependencies
@@ -44,9 +44,9 @@ func NewUsersHandler(
 	beersRepo repositories.BeersRepositoryInterface,
 	notifierSrv notifier) *UsersHandler {
 	return &UsersHandler{
-		userRepo: userRepo,
+		userRepo:  userRepo,
 		beersRepo: beersRepo,
-		notifier: notifierSrv,
+		notifier:  notifierSrv,
 	}
 }
 

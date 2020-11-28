@@ -31,7 +31,6 @@ type UsersRepositoryInterface interface {
 	Delete(ctx context.Context, ID string) (bool, error)
 	AddBeerTransfer(ctx context.Context, giverID string, takerID string, beers int) (int, error)
 	GetBeerTransfersSummary(ctx context.Context, userID string) (*UserBeerLog, error)
-	ClearTokens(ctx context.Context, ID string) error
 }
 
 // UsersRepository implements UsersRepositoryInterface
@@ -170,6 +169,7 @@ func (r *UsersRepository) Delete(ctx context.Context, ID string) (bool, error) {
 	return rows > 0, nil
 }
 
+// AddBeerTransfer adds a beer transference record between two users
 func (r *UsersRepository) AddBeerTransfer(ctx context.Context, giverID string, takerID string, beers int) (int, error) {
 	stmt := "INSERT INTO beer_transfers (giver_id, taker_id, beers) VALUES ($1, $2, $3) RETURNING id"
 	var newID int
@@ -181,6 +181,7 @@ func (r *UsersRepository) AddBeerTransfer(ctx context.Context, giverID string, t
 	return newID, nil
 }
 
+// GetBeerTransfersSummary gets a user's beer transference summary (amount of given, received beers)
 func (r *UsersRepository) GetBeerTransfersSummary(ctx context.Context, userID string) (*UserBeerLog, error) {
 	beerLog := &UserBeerLog{}
 
@@ -197,14 +198,4 @@ func (r *UsersRepository) GetBeerTransfersSummary(ctx context.Context, userID st
 	}
 
 	return beerLog, nil
-}
-
-func (r *UsersRepository) ClearTokens(ctx context.Context, userID string) error {
-	stmt := "UPDATE users SET oidc_refresh_token = NULL WHERE id = $1"
-	_, err := r.db.ExecContext(ctx, stmt, userID)
-	if err != nil {
-		return parseError(err)
-	}
-
-	return nil
 }

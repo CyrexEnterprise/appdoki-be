@@ -7,7 +7,6 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"github.com/coreos/go-oidc"
 	"golang.org/x/oauth2"
 	"net/http"
@@ -186,25 +185,6 @@ func (h *AuthHandler) Callback(w http.ResponseWriter, r *http.Request) {
 	}{
 		Token: rawIDToken,
 	}, http.StatusOK)
-}
-
-func (h *AuthHandler) Revoke(w http.ResponseWriter, r *http.Request) {
-	var tokenPayload TokenPayload
-	err := json.NewDecoder(r.Body).Decode(&tokenPayload)
-	if err != nil {
-		respondInternalError(w)
-		return
-	}
-
-	userID := fmt.Sprintf("%v", r.Context().Value("userID"))
-
-	err = h.userRepo.ClearTokens(r.Context(), userID)
-	if err != nil {
-		respondInternalError(w)
-		return
-	}
-
-	respondNoContent(w, http.StatusNoContent)
 }
 
 func (h *AuthHandler) FindCreateUser(w http.ResponseWriter, r *http.Request) {

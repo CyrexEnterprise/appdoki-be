@@ -4,6 +4,7 @@ go 1.15
 
 require (
 	firebase.google.com/go/v4 v4.1.0
+	github.com/brianvoe/gofakeit/v5 v5.10.1
 	github.com/coreos/go-oidc v2.2.1+incompatible
 	github.com/golang-migrate/migrate/v4 v4.13.0
 	github.com/gorilla/mux v1.8.0
