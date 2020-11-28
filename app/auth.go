@@ -239,11 +239,9 @@ func (h *AuthHandler) FindCreateUser(w http.ResponseWriter, r *http.Request) {
 
 	if created == true && user != nil {
 		go func() {
+			userJSON, _ := json.Marshal(user)
 			h.notifier.messageAll(usersTopic, map[string]string{
-				"id":      user.ID,
-				"name":    user.Name,
-				"email":   user.Email,
-				"picture": user.Picture,
+				"user": string(userJSON),
 			})
 		}()
 	}

@@ -34,13 +34,18 @@ func (p *CreateUserPayload) validate() []string {
 // UsersHandler holds handler dependencies
 type UsersHandler struct {
 	userRepo repositories.UsersRepositoryInterface
+	beersRepo repositories.BeersRepositoryInterface
 	notifier notifier
 }
 
 // NewUsersHandler returns an initialized users handler with the required dependencies
-func NewUsersHandler(userRepo repositories.UsersRepositoryInterface, notifierSrv notifier) *UsersHandler {
+func NewUsersHandler(
+	userRepo repositories.UsersRepositoryInterface,
+	beersRepo repositories.BeersRepositoryInterface,
+	notifierSrv notifier) *UsersHandler {
 	return &UsersHandler{
 		userRepo: userRepo,
+		beersRepo: beersRepo,
 		notifier: notifierSrv,
 	}
 }
@@ -216,31 +221,34 @@ func (h *UsersHandler) GiveBeers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = h.userRepo.AddBeerTransfer(r.Context(), userID, takerUserId, beers)
+	transferID, err := h.userRepo.AddBeerTransfer(r.Context(), userID, takerUserId, beers)
 	if err != nil {
 		respondInternalError(w)
 		return
 	}
 
 	go func() {
-		giver, err := h.userRepo.FindByID(context.Background(), userID)
+		backgroundCtx := context.Background()
+		transfer, err := h.beersRepo.GetBeerTransfer(backgroundCtx, transferID)
 		if err != nil {
-			log.Error("error getting giver: ", err)
-		}
-		receiver, err := h.userRepo.FindByID(context.Background(), takerUserId)
-		if err != nil {
-			log.Errorln("error getting receiver: ", err)
-		}
-
-		if giver == nil || receiver == nil {
-			log.Warn("could not fetch users for beers notification")
+			log.Error("failed to get beer transfer")
 			return
 		}
 
-		h.notifier.notifyAll(beersTopic, messaging.Notification{
+		giverJSON, _ := json.Marshal(transfer.Giver)
+		receiverJSON, _ := json.Marshal(transfer.Receiver)
+		notification := &messaging.Notification{
 			Title: "BeerTab event",
-			Body:  fmt.Sprintf("%s just rewarded %s with %d beers!", giver.Name, receiver.Name, beers),
-		})
+			Body:  fmt.Sprintf("%s just rewarded %s with %d beers!", transfer.Giver.Name, transfer.Receiver.Name, beers),
+		}
+		data := map[string]string{
+			"giver":    string(giverJSON),
+			"receiver": string(receiverJSON),
+			"beers":    strconv.Itoa(beers),
+			"givenAt":  transfer.GivenAt,
+		}
+
+		h.notifier.notifyAll(beersTopic, notification, data)
 	}()
 
 	respondNoContent(w, http.StatusNoContent)

@@ -1,1 +1,1 @@
-CREATE INDEX "idx_beer_transfers_give_at" ON beer_transfers (given_at);
+CREATE INDEX "idx_beer_transfers_given_at" ON beer_transfers (given_at);

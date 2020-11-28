@@ -29,6 +29,7 @@ func (o *BeerFeedPaginationOptions) SetLtOperator() {
 
 // BeersRepositoryInterface defines the set of User related methods available
 type BeersRepositoryInterface interface {
+	GetBeerTransfer(ctx context.Context, id int) (*BeerTransferFeedItem, error)
 	GetBeerTransfers(ctx context.Context, options *BeerFeedPaginationOptions) ([]BeerTransferFeedItem, error)
 }
 
@@ -42,23 +43,47 @@ func NewBeersRepository(db *sqlx.DB) *BeersRepository {
 	return &BeersRepository{db: db}
 }
 
-func (r *BeersRepository) GetBeerTransfers(ctx context.Context, options *BeerFeedPaginationOptions) ([]BeerTransferFeedItem, error) {
-	baseQuery := `
-		SELECT giver.id,
-				giver.name,
-				giver.email,
-				giver.picture,
-				receiver.id,
-				receiver.name,
-				receiver.email,
-				receiver.picture,
-				btf.beers,
-				btf.given_at
-		FROM beer_transfers btf 
-		JOIN users giver ON giver.id = btf.giver_id 
-		JOIN users receiver ON receiver.id = btf.taker_id
-	`
+const baseBeerTransferQuery = `
+	SELECT giver.id,
+			giver.name,
+			giver.email,
+			giver.picture,
+			receiver.id,
+			receiver.name,
+			receiver.email,
+			receiver.picture,
+			btf.beers,
+			btf.given_at
+	FROM beer_transfers btf 
+	JOIN users giver ON giver.id = btf.giver_id 
+	JOIN users receiver ON receiver.id = btf.taker_id
+`
 
+func (r *BeersRepository) GetBeerTransfer(ctx context.Context, id int) (*BeerTransferFeedItem, error) {
+	query := baseBeerTransferQuery + " WHERE btf.id = $1;"
+	row := r.db.QueryRowxContext(ctx, query, id)
+
+	var t BeerTransferFeedItem
+	err := row.Scan(
+		&t.Giver.ID,
+		&t.Giver.Name,
+		&t.Giver.Email,
+		&t.Giver.Picture,
+		&t.Receiver.ID,
+		&t.Receiver.Name,
+		&t.Receiver.Email,
+		&t.Receiver.Picture,
+		&t.Beers,
+		&t.GivenAt)
+
+	if err != nil {
+		return nil, parseError(err)
+	}
+
+	return &t, nil
+}
+
+func (r *BeersRepository) GetBeerTransfers(ctx context.Context, options *BeerFeedPaginationOptions) ([]BeerTransferFeedItem, error) {
 	var whereClause string
 	var limitClause string
 
@@ -67,7 +92,7 @@ func (r *BeersRepository) GetBeerTransfers(ctx context.Context, options *BeerFee
 		whereClause = fmt.Sprintf(" WHERE given_at %s $1", options.op)
 	}
 
-	query := fmt.Sprintf("%s %s ORDER BY btf.given_at DESC %s;", baseQuery, whereClause, limitClause)
+	query := fmt.Sprintf("%s %s ORDER BY btf.given_at DESC %s;", baseBeerTransferQuery, whereClause, limitClause)
 
 	var rows *sqlx.Rows
 	var err error

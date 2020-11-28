@@ -1,6 +1,7 @@
 .idea/
 .vscode/
 *.env
+.localenv
 .DS_Store
 db/
 migrations/bin

@@ -17,7 +17,7 @@ type notifyService struct {
 }
 
 type notifier interface {
-	notifyAll(topic string, content messaging.Notification)
+	notifyAll(topic string, notification *messaging.Notification, data map[string]string)
 	messageAll(topic string, content map[string]string)
 }
 
@@ -44,9 +44,10 @@ func newNotifier(app *firebase.App) (*notifyService, error) {
 	}, nil
 }
 
-func (n *notifyService) notifyAll(topic string, content messaging.Notification) {
+func (n *notifyService) notifyAll(topic string, notification *messaging.Notification, data map[string]string) {
 	n.sendMessage(&messaging.Message{
-		Notification: &content,
+		Data:         data,
+		Notification: notification,
 		Topic:        topic,
 		Android:      n.androidMsgConfig,
 		APNS:         n.apnsMsgConfig,

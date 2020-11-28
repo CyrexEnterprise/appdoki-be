@@ -28,7 +28,7 @@ For convenience, [golang-migrate](https://github.com/golang-migrate/migrate) can
 
 You can find helper commands in the Makefile for this:
 - get-migrator: downloads the migrator bin into `migrations/bin` (this directory is gitignored)
-- create-migrations: receives an argument for migration name (ex.:`make create-migration alter-users-add-superhero`)
+- create-migrations: receives an argument for migration name (ex.:`make create-migration name=alter-users-add-superhero`)
 - migrate-up: runs all migrations up
 - migrate-down: runs all migrations down
 

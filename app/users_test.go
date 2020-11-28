@@ -19,7 +19,7 @@ type mockUsersRepository struct {
 	createImpl             func(ctx context.Context, user *repositories.User) (*repositories.User, error)
 	updateImpl             func(ctx context.Context, user *repositories.User) (*repositories.User, error)
 	deleteImpl             func(ctx context.Context, ID string) (bool, error)
-	addBeerTransferImpl    func(ctx context.Context, giverID string, takerID string, beers int) error
+	addBeerTransferImpl    func(ctx context.Context, giverID string, takerID string, beers int) (int, error)
 	getBeerTransferLogImpl func(ctx context.Context, userID string) (*repositories.UserBeerLog, error)
 	clearTokensImpl        func(ctx context.Context, ID string) error
 }
@@ -52,7 +52,7 @@ func (r *mockUsersRepository) Delete(ctx context.Context, ID string) (bool, erro
 	return r.deleteImpl(ctx, ID)
 }
 
-func (r *mockUsersRepository) AddBeerTransfer(ctx context.Context, giverID string, takerID string, beers int) error {
+func (r *mockUsersRepository) AddBeerTransfer(ctx context.Context, giverID string, takerID string, beers int) (int, error) {
 	return r.addBeerTransferImpl(ctx, giverID, takerID, beers)
 }
 
@@ -99,7 +99,8 @@ func getDefaultMockUsersRepository() *mockUsersRepository {
 
 type mockNotifier struct{}
 
-func (n *mockNotifier) notifyAll(_ string, _ messaging.Notification) {}
+func (n *mockNotifier) notifyAll(_ string, _ *messaging.Notification, _ map[string]string) {}
+func (n *mockNotifier) messageAll(_ string, _ map[string]string)                           {}
 
 func getMockNotifier() *mockNotifier {
 	return &mockNotifier{}

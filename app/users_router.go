@@ -6,7 +6,7 @@ import (
 )
 
 func (a *Application) UsersRouter(router *mux.Router) {
-	usersHandler := NewUsersHandler(a.usersRepository, a.notifier)
+	usersHandler := NewUsersHandler(a.usersRepository, a.beersRepository, a.notifier)
 
 	router.
 		Methods(http.MethodGet).
