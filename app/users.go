@@ -239,7 +239,7 @@ func (h *UsersHandler) GiveBeers(w http.ResponseWriter, r *http.Request) {
 
 		h.notifier.notifyAll(beersTopic, messaging.Notification{
 			Title: "BeerTab event",
-			Body:  fmt.Sprintf("%s just rewarded %s with %n beers!", giver.Name, receiver.Name, beers),
+			Body:  fmt.Sprintf("%s just rewarded %s with %d beers!", giver.Name, receiver.Name, beers),
 		})
 	}()
 
