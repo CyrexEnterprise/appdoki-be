@@ -87,6 +87,7 @@ func (h *UsersHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	respondJSON(w, user, http.StatusOK)
 }
 
+// GiveBeers creates a beer transaction between two users
 func (h *UsersHandler) GiveBeers(w http.ResponseWriter, r *http.Request) {
 	userID := fmt.Sprintf("%v", r.Context().Value("userID"))
 
@@ -160,6 +161,7 @@ func (h *UsersHandler) GiveBeers(w http.ResponseWriter, r *http.Request) {
 	respondNoContent(w, http.StatusNoContent)
 }
 
+// BeersSummary generates a short beer transfer summary for a user
 func (h *UsersHandler) BeersSummary(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	userID, ok := vars["id"]
