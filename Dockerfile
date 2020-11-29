@@ -1,5 +1,5 @@
 # BUILD STAGE
-FROM golang:alpine as builder
+FROM golang:1.15-alpine as builder
 
 ENV GO111MODULE=on
 RUN apk update && apk add --no-cache git
@@ -10,7 +10,7 @@ RUN go mod download
 
 COPY . .
 
-RUN GOOS=linux go build -o appdokibin .
+RUN CGO_ENABLED=0 GOOS=linux go build -o appdokibin .
 
 # FINAL STAGE
 FROM alpine:latest
