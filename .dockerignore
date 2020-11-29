@@ -2,5 +2,6 @@
 .vscode/
 .env
 .DS_Store
+.circleci/
 db/
 Makefile
