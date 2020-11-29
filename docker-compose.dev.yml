@@ -18,6 +18,7 @@ services:
       - GOOGLE_OIDC_IOS_CLIENT_ID=${GOOGLE_OIDC_IOS_CLIENT_ID}
       - GOOGLE_OIDC_ANDROID_CLIENT_ID=${GOOGLE_OIDC_ANDROID_CLIENT_ID}
       - GOOGLE_SERVICE_ACCOUNT_KEY=${GOOGLE_SERVICE_ACCOUNT_KEY}
+      - WAIT_HOSTS=postgresql:5432
     volumes:
       - './certs:/root/app/certs'
   postgresql:
