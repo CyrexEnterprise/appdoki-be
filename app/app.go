@@ -19,7 +19,11 @@ type Application struct {
 }
 
 func NewApplication(conf *config.Config, db *sqlx.DB, firebaseApp *firebase.App) *Application {
-	notifierSrv, err := newNotifier(firebaseApp)
+	notifierDryRun := false
+	if conf.Env == "test" {
+		notifierDryRun = true
+	}
+	notifierSrv, err := newNotifier(firebaseApp, notifierDryRun)
 	if err != nil {
 		log.Fatal("could not instantiate a notifier")
 	}
@@ -52,18 +56,18 @@ func (a *Application) Routes() http.Handler {
 	}, router)
 }
 
-func homeHandler(w http.ResponseWriter, r *http.Request) {
-	type TopicInfo struct {
-		Topic       string
-		Description string
-	}
-	type homeResponse struct {
-		Version         string
-		DocsEndpoint    string
-		MessagingTopics []TopicInfo
-	}
+type TopicInfo struct {
+	Topic       string
+	Description string
+}
+type HomeResponse struct {
+	Version         string
+	DocsEndpoint    string
+	MessagingTopics []TopicInfo
+}
 
-	res := homeResponse{
+func homeHandler(w http.ResponseWriter, _ *http.Request) {
+	res := HomeResponse{
 		Version:      "1.0.0",
 		DocsEndpoint: "/docs/",
 		MessagingTopics: []TopicInfo{

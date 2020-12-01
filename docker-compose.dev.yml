@@ -19,6 +19,8 @@ services:
       - GOOGLE_OIDC_ANDROID_CLIENT_ID=${GOOGLE_OIDC_ANDROID_CLIENT_ID}
       - GOOGLE_SERVICE_ACCOUNT_KEY=${GOOGLE_SERVICE_ACCOUNT_KEY}
       - WAIT_HOSTS=postgresql:5432
+      - DB_SEED=${DB_SEED}
+      - ENV=${ENV}
     volumes:
       - './certs:/root/app/certs'
   postgresql:

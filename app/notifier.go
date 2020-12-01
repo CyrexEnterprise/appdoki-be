@@ -14,6 +14,7 @@ type notifyService struct {
 	client           *messaging.Client
 	androidMsgConfig *messaging.AndroidConfig
 	apnsMsgConfig    *messaging.APNSConfig
+	dryRun           bool
 }
 
 type notifier interface {
@@ -21,7 +22,7 @@ type notifier interface {
 	messageAll(topic string, content map[string]string)
 }
 
-func newNotifier(app *firebase.App) (*notifyService, error) {
+func newNotifier(app *firebase.App, dryRun bool) (*notifyService, error) {
 	ctx := context.Background()
 	client, err := app.Messaging(ctx)
 	if err != nil {
@@ -30,6 +31,7 @@ func newNotifier(app *firebase.App) (*notifyService, error) {
 	}
 
 	return &notifyService{
+		dryRun: dryRun,
 		client: client,
 		androidMsgConfig: &messaging.AndroidConfig{
 			Priority: "high",
@@ -64,7 +66,12 @@ func (n *notifyService) messageAll(topic string, content map[string]string) {
 }
 
 func (n *notifyService) sendMessage(message *messaging.Message) {
-	response, err := n.client.Send(context.Background(), message)
+	sendFunc := n.client.Send
+	if n.dryRun {
+		sendFunc = n.client.SendDryRun
+	}
+
+	response, err := sendFunc(context.Background(), message)
 	if err != nil {
 		log.Errorf("error sending message to topic %s: %v\n", message.Topic, err)
 	}
