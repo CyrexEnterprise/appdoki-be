@@ -29,4 +29,8 @@ func TestAPI_ListUsers(t *testing.T) {
 	if err != nil {
 		t.Fatal("expected to be able to parse response body")
 	}
+
+	if len(response) != 5 {
+		t.Fatal("expected to be get 5 users")
+	}
 }

@@ -4,32 +4,30 @@ services:
     container_name: appdoki-api
     build: .
     ports:
-      - "4001:4000"
+      - "4000:4000"
     depends_on:
       - postgresql
     environment:
-      - ADDRESS=${ADDRESS}
-      - DB_URI=${DB_URI}
-      - GOOGLE_OAUTH_CLIENT_ID=${GOOGLE_OAUTH_CLIENT_ID}
-      - GOOGLE_OAUTH_CLIENT_SECRET=${GOOGLE_OAUTH_CLIENT_SECRET}
-      - GOOGLE_OAUTH_REDIRECT_URL=${GOOGLE_OAUTH_REDIRECT_URL}
-      - DB_MIGRATIONS_VERBOSE=${DB_MIGRATIONS_VERBOSE}
-      - GOOGLE_OIDC_WEB_CLIENT_ID=${GOOGLE_OIDC_WEB_CLIENT_ID}
-      - GOOGLE_OIDC_IOS_CLIENT_ID=${GOOGLE_OIDC_IOS_CLIENT_ID}
-      - GOOGLE_OIDC_ANDROID_CLIENT_ID=${GOOGLE_OIDC_ANDROID_CLIENT_ID}
-      - GOOGLE_SERVICE_ACCOUNT_KEY=${GOOGLE_SERVICE_ACCOUNT_KEY}
+      - TEST_MODE
+      - ADDRESS
+      - DB_URI
+      - GOOGLE_OAUTH_CLIENT_SECRET
+      - GOOGLE_OAUTH_REDIRECT_URL
+      - GOOGLE_OIDC_WEB_CLIENT_ID
+      - GOOGLE_OIDC_IOS_CLIENT_ID
+      - GOOGLE_OIDC_ANDROID_CLIENT_ID
+      - GOOGLE_SERVICE_ACCOUNT_KEY
+      - DB_MIGRATIONS_VERBOSE
       - WAIT_HOSTS=postgresql:5432
-      - DB_SEED=${DB_SEED}
-      - ENV=${ENV}
     volumes:
       - './certs:/root/app/certs'
   postgresql:
     container_name: appdoki-db
     image: postgres:13
     environment:
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_DB
     volumes:
       - './db:/var/lib/postgresql/data'
     ports:

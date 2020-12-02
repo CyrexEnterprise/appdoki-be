@@ -47,12 +47,12 @@ These can be run on an already running application or on an isolated Docker envi
 Prepare for tests by copy `.env` to `.test.env` and change accordingly. Some variables are very important to set while running tests:
 
 ```
-ENV=test
-DB_SEED=true
 API_URL=http://localhost:4001
-NOTIFIER_TEST_MODE=true
+TEST_MODE=true
 ```
 
 Executing `make integration-tests-compose` will create Docker containers for the API and database, seed the database with test data and run the tests.
+
+It's also possible to prepare only the containers (`make compose-integration`) and leave test running for yourself to, for example, debug the tests in the IDE. 
 
 Seeds are also generated in Go files. Find them in `./seed`.

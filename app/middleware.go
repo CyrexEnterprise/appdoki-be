@@ -59,6 +59,13 @@ const (
 )
 
 func (a *Application) JwtVerify(next http.HandlerFunc) http.HandlerFunc {
+	if a.conf.AppConfig.TestMode {
+		return func(w http.ResponseWriter, r *http.Request) {
+			newReq := r.WithContext(context.WithValue(r.Context(), "userID", "1"))
+			next.ServeHTTP(w, newReq)
+		}
+	}
+
 	return func(w http.ResponseWriter, r *http.Request) {
 		const bearerHeaderPrefix = "Bearer "
 		tokenHeader := r.Header.Get("Authorization")

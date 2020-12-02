@@ -19,7 +19,7 @@ type Application struct {
 }
 
 func NewApplication(conf *config.Config, db *sqlx.DB, firebaseApp *firebase.App) *Application {
-	notifierSrv, err := newNotifier(firebaseApp, conf.AppConfig.NotifierTestMode)
+	notifierSrv, err := newNotifier(firebaseApp, conf.AppConfig.TestMode)
 	if err != nil {
 		log.Fatal("could not instantiate a notifier")
 	}

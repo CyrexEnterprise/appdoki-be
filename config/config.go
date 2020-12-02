@@ -16,7 +16,7 @@ type AppConfig struct {
 	AndroidClientID             string
 	RevokeEndpoint              string
 	GoogleServiceAccountKeyPath string
-	NotifierTestMode            bool
+	TestMode                    bool
 }
 
 func (c *AppConfig) GetPlatformClientID(platform string) string {
@@ -61,7 +61,7 @@ func NewConfig() *Config {
 			Address: getEnv("ADDRESS", "localhost:4000"),
 		},
 		AppConfig: AppConfig{
-			NotifierTestMode:            getEnvAsBool("NOTIFIER_TEST_MODE", false),
+			TestMode:                    getEnvAsBool("TEST_MODE", false),
 			OIDCProvider:                provider,
 			RevokeEndpoint:              getEnv("GOOGLE_OIDC_REVOKE_URL", "https://oauth2.googleapis.com/revoke"),
 			WebClientID:                 os.Getenv("GOOGLE_OIDC_WEB_CLIENT_ID"),
