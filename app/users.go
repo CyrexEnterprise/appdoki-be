@@ -149,6 +149,7 @@ func (h *UsersHandler) GiveBeers(w http.ResponseWriter, r *http.Request) {
 			Body:  fmt.Sprintf("%s just rewarded %s with %d beers!", transfer.Giver.Name, transfer.Receiver.Name, beers),
 		}
 		data := map[string]string{
+			"id":    	string(transferID),
 			"giver":    string(giverJSON),
 			"receiver": string(receiverJSON),
 			"beers":    strconv.Itoa(beers),
