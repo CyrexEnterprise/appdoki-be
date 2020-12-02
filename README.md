@@ -42,17 +42,30 @@ You can find helper commands in the Makefile for this:
 
 Integration tests are kept in `./tests` and are developed using Go's testing library and guidelines.
 
-These can be run on an already running application or on an isolated Docker environment. All necessary commands are available in the Makefile.
+These can be run against an existing application or on an isolated Docker environment. 
+All necessary commands are available in the Makefile.
 
-Prepare for tests by copy `.env` to `.test.env` and change accordingly. Some variables are very important to set while running tests:
+Prepare for tests by copying `.env` to `.test.env` and changing accordingly. 
+Some variables are very important to set while running tests:
 
 ```
 API_URL=http://localhost:4001
 TEST_MODE=true
 ```
 
-Executing `make integration-tests-compose` will create Docker containers for the API and database, seed the database with test data and run the tests.
+Executing `make integration-tests-compose` will create Docker containers for the API and 
+database, seed the database with test data and run the tests.
 
-It's also possible to prepare only the containers (`make compose-integration`) and leave test running for yourself to, for example, debug the tests in the IDE. 
+It's also possible to prepare only the containers (`make compose-integration`) and 
+leave test running for yourself to, for example, debug the tests in the IDE. 
 
 Seeds are also generated in Go files. Find them in `./seed`.
+
+#### In-Test Authentication
+
+This application uses Google's OpenID Connect Authentication. 
+Since Google does not provide test users or similar feature, the application has a test mode 
+that skips Bearer token validation but still injects properties in the request context. 
+This should be adapted as the tests evolve.
+
+An idea for future improvement is to support an extra OIDC and use it for tests only. 
