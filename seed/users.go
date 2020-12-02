@@ -1,4 +1,4 @@
-package seed
+package main
 
 import (
 	"fmt"
@@ -30,5 +30,5 @@ func (s *seeder) seedUsers() {
 	if err != nil {
 		log.Fatalf("seedUsers failed: %+v", err)
 	}
-	log.Debug("seeded users")
+	log.Info("seeded users")
 }

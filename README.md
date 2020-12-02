@@ -37,3 +37,22 @@ You can find helper commands in the Makefile for this:
 - create a PostgreSQL database and user
 - create a `.env` file and change accordingly (there is a `.env.sample`)
 - run the project (a few options: `go run .`; use your debugger; `make compose-dev`...)
+
+### Integration tests
+
+Integration tests are kept in `./tests` and are developed using Go's testing library and guidelines.
+
+These can be run on an already running application or on an isolated Docker environment. All necessary commands are available in the Makefile.
+
+Prepare for tests by copy `.env` to `.test.env` and change accordingly. Some variables are very important to set while running tests:
+
+```
+ENV=test
+DB_SEED=true
+API_URL=http://localhost:4001
+NOTIFIER_TEST_MODE=true
+```
+
+Executing `make integration-tests-compose` will create Docker containers for the API and database, seed the database with test data and run the tests.
+
+Seeds are also generated in Go files. Find them in `./seed`.

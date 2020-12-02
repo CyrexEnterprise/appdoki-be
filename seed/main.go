@@ -1,7 +1,8 @@
-package seed
+package main
 
 import (
 	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 	log "github.com/sirupsen/logrus"
 	"os"
 )
@@ -23,6 +24,7 @@ func main() {
 	}
 
 	Seed(db)
+	log.Infoln("finished seeding...")
 }
 
 func Seed(db *sqlx.DB) {
@@ -37,5 +39,5 @@ func (s *seeder) truncateAll() {
 	if err != nil {
 		log.Fatalf("seedBeerTransfers failed: %+v", err)
 	}
-	log.Debug("seeder: truncated all tables")
+	log.Info("seeder: truncated all tables")
 }

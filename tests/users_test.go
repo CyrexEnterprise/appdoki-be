@@ -1,14 +1,15 @@
 package tests
 
 import (
+	"appdoki-be/app/repositories"
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"testing"
 )
 
 func TestAPI_ListUsers(t *testing.T) {
-	t.SkipNow()
-	res, err := http.Get("http://localhost:4040/")
+	res, err := http.Get(apiURL + "/users")
  	if err != nil {
 		t.Fatal(err)
 	}
@@ -23,12 +24,9 @@ func TestAPI_ListUsers(t *testing.T) {
 		t.Fatal("expected to be able to read response body")
 	}
 
-	//var statusInfo QueryResult
-	//err = json.Unmarshal(jsonData, &statusInfo)
-	//if err != nil {
-	//	return nil, e.WithStack(err)
-	//}
-
-	t.Log(string(body))
-	t.Log(body)
+	var response []repositories.User
+	err = json.Unmarshal(body, &response)
+	if err != nil {
+		t.Fatal("expected to be able to parse response body")
+	}
 }

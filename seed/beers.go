@@ -1,4 +1,4 @@
-package seed
+package main
 
 import (
 	"fmt"
@@ -34,5 +34,5 @@ func (s *seeder) seedBeerTransfers() {
 	if err != nil {
 		log.Fatalf("seedBeerTransfers failed: %+v", err)
 	}
-	log.Debug("beers users")
+	log.Info("beers users")
 }

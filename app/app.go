@@ -19,11 +19,7 @@ type Application struct {
 }
 
 func NewApplication(conf *config.Config, db *sqlx.DB, firebaseApp *firebase.App) *Application {
-	notifierDryRun := false
-	if conf.Env == "test" {
-		notifierDryRun = true
-	}
-	notifierSrv, err := newNotifier(firebaseApp, notifierDryRun)
+	notifierSrv, err := newNotifier(firebaseApp, conf.AppConfig.NotifierTestMode)
 	if err != nil {
 		log.Fatal("could not instantiate a notifier")
 	}
