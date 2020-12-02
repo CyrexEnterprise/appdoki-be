@@ -18,7 +18,7 @@ func TestMain(m *testing.M) {
 
 func TestAPI_Root(t *testing.T) {
 	res, err := http.Get(apiURL + "/")
- 	if err != nil {
+	if err != nil {
 		t.Fatal(err)
 	}
 	defer res.Body.Close()

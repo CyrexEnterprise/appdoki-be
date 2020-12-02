@@ -115,20 +115,20 @@ paths:
         - $ref: '#/components/parameters/platformHeader'
         - name: limit
           in: query
-          description: Number of records to return. Requires usage of givenAt param.
+          description: Number of records to return.
           schema:
             type: number
             default: 20
         - name: op
           in: query
-          description: Comparison operator for the pagination. Requires usage of givenAt param.
+          description: Comparison operator for the pagination.
           schema:
             type: string
             enum: [ lt, gt ]
             default: gt
         - name: givenAt
           in: query
-          description: GivenAt timestamp used for pagination. Mandatory for the result to be paginated.
+          description: GivenAt timestamp used for pagination. Defaults to current timestamp.
           schema:
             type: string
       responses:
@@ -213,6 +213,8 @@ components:
       items:
         type: object
         properties:
+          id:
+            type: number
           giver:
             type: object
             $ref: '#/components/schemas/User'

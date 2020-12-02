@@ -20,7 +20,7 @@ func (s *seeder) seedUsers() {
 
 	for i, usr := range users {
 		separator := ", "
-		if i == len(users) - 1 {
+		if i == len(users)-1 {
 			separator = ""
 		}
 		sqlStr = sqlStr + fmt.Sprintf("('%s', '%s', '%s', '%s')%s", usr[0], usr[1], usr[2], usr[3], separator)

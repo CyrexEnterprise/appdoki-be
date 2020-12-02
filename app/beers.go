@@ -4,6 +4,7 @@ import (
 	"appdoki-be/app/repositories"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 // BeersHandler holds handler dependencies
@@ -25,9 +26,8 @@ func (h *BeersHandler) Get(w http.ResponseWriter, r *http.Request) {
 		GivenAt: "",
 	}
 
-	givenAt := r.URL.Query().Get("givenAt")
-
-	if len(givenAt) > 0 {
+	limitParam := r.URL.Query().Get("limit")
+	if len(limitParam) > 0 {
 		limit, err := strconv.Atoi(r.URL.Query().Get("limit"))
 		if err != nil {
 			respondJSON(w, &appError{
@@ -37,16 +37,20 @@ func (h *BeersHandler) Get(w http.ResponseWriter, r *http.Request) {
 		}
 
 		options.Limit = limit
-		options.GivenAt = givenAt
+	}
 
-		switch r.URL.Query().Get("op") {
-		case "gt":
-			options.SetGtOperator()
-		case "lt":
-			options.SetLtOperator()
-		default:
-			options.SetGtOperator()
-		}
+	options.GivenAt = r.URL.Query().Get("givenAt")
+	if len(options.GivenAt) == 0 {
+		options.GivenAt = time.Now().Format(time.RFC3339)
+	}
+
+	switch r.URL.Query().Get("op") {
+	case "gt":
+		options.SetGtOperator()
+	case "lt":
+		options.SetLtOperator()
+	default:
+		options.SetLtOperator()
 	}
 
 	feed, err := h.beersRepo.GetBeerTransfers(r.Context(), options)

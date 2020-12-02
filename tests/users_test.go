@@ -10,7 +10,7 @@ import (
 
 func TestAPI_ListUsers(t *testing.T) {
 	res, err := http.Get(apiURL + "/users")
- 	if err != nil {
+	if err != nil {
 		t.Fatal(err)
 	}
 	defer res.Body.Close()

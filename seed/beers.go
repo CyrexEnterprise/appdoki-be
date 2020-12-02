@@ -5,26 +5,22 @@ import (
 	"github.com/brianvoe/gofakeit/v5"
 	log "github.com/sirupsen/logrus"
 	"strconv"
+	"time"
 )
 
 func (s *seeder) seedBeerTransfers() {
 	gofakeit.Seed(0)
-	transfers := [][]string{
-		{"1", "2", strconv.Itoa(gofakeit.Number(1, 50)), "2020-01-01"},
-		{"2", "1", strconv.Itoa(gofakeit.Number(1, 50)), "2020-01-05"},
-		{"3", "2", strconv.Itoa(gofakeit.Number(1, 50)), "2020-03-08"},
-		{"4", "5", strconv.Itoa(gofakeit.Number(1, 50)), "2020-06-09"},
-		{"4", "5", strconv.Itoa(gofakeit.Number(1, 50)), "2020-06-22"},
-		{"5", "3", strconv.Itoa(gofakeit.Number(1, 50)), "2020-07-07 10:11:11"},
-		{"5", "1", strconv.Itoa(gofakeit.Number(1, 50)), "2020-07-07 10:11:12"},
-		{"5", "4", strconv.Itoa(gofakeit.Number(1, 50)), "2020-07-07 10:11:13"},
+
+	var transfers [][]string
+	for i := 1; i <= 50; i++ {
+		transfers = append(transfers, generateRandomBeerTransfer())
 	}
 
 	sqlStr := "INSERT INTO beer_transfers (giver_id, taker_id, beers, given_at) VALUES "
 
 	for i, usr := range transfers {
 		separator := ", "
-		if i == len(transfers) - 1 {
+		if i == len(transfers)-1 {
 			separator = ""
 		}
 		sqlStr = sqlStr + fmt.Sprintf("('%s', '%s', '%s', '%s')%s", usr[0], usr[1], usr[2], usr[3], separator)
@@ -35,4 +31,19 @@ func (s *seeder) seedBeerTransfers() {
 		log.Fatalf("seedBeerTransfers failed: %+v", err)
 	}
 	log.Info("beers users")
+}
+
+func generateRandomBeerTransfer() []string {
+	giverID := gofakeit.Number(1, 5)
+	receiverID := giverID
+	for receiverID == giverID {
+		receiverID = gofakeit.Number(1, 5)
+	}
+
+	return []string{
+		strconv.Itoa(giverID),
+		strconv.Itoa(receiverID),
+		strconv.Itoa(gofakeit.Number(1, 50)),
+		gofakeit.DateRange(time.Date(2018, 1, 1, 0, 0, 0, 0, time.UTC), time.Now()).Format(time.RFC3339),
+	}
 }

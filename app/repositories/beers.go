@@ -7,6 +7,7 @@ import (
 )
 
 type BeerTransferFeedItem struct {
+	ID       int    `json:"id"`
 	Beers    int    `json:"beers"`
 	GivenAt  string `json:"givenAt" db:"given_at"`
 	Giver    User   `json:"giver"`
@@ -53,7 +54,8 @@ const baseBeerTransferQuery = `
 			receiver.email,
 			receiver.picture,
 			btf.beers,
-			btf.given_at
+			btf.given_at,
+			btf.id
 	FROM beer_transfers btf 
 	JOIN users giver ON giver.id = btf.giver_id 
 	JOIN users receiver ON receiver.id = btf.taker_id
@@ -74,7 +76,8 @@ func (r *BeersRepository) GetBeerTransfer(ctx context.Context, id int) (*BeerTra
 		&t.Receiver.Email,
 		&t.Receiver.Picture,
 		&t.Beers,
-		&t.GivenAt)
+		&t.GivenAt,
+		&t.ID)
 
 	if err != nil {
 		return nil, parseError(err)
@@ -107,20 +110,21 @@ func (r *BeersRepository) GetBeerTransfers(ctx context.Context, options *BeerFee
 
 	var beerFeed []BeerTransferFeedItem
 	for rows.Next() {
-		var l BeerTransferFeedItem
+		var t BeerTransferFeedItem
 
 		err = rows.Scan(
-			&l.Giver.ID,
-			&l.Giver.Name,
-			&l.Giver.Email,
-			&l.Giver.Picture,
-			&l.Receiver.ID,
-			&l.Receiver.Name,
-			&l.Receiver.Email,
-			&l.Receiver.Picture,
-			&l.Beers,
-			&l.GivenAt)
-		beerFeed = append(beerFeed, l)
+			&t.Giver.ID,
+			&t.Giver.Name,
+			&t.Giver.Email,
+			&t.Giver.Picture,
+			&t.Receiver.ID,
+			&t.Receiver.Name,
+			&t.Receiver.Email,
+			&t.Receiver.Picture,
+			&t.Beers,
+			&t.GivenAt,
+			&t.ID)
+		beerFeed = append(beerFeed, t)
 	}
 
 	return beerFeed, nil

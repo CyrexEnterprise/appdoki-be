@@ -1,7 +1,7 @@
 OS_NAME := $(shell uname -s | tr A-Z a-z)
 SHELL := /bin/bash
-DB_URI := 1#$(shell grep DB_URI .env | sed 's/DB_URI=//')
-API_URL := $(shell grep API_URL .env | sed 's/API_URL=//')
+DB_URI := $(shell grep DB_URI .env | sed 's/DB_URI=//')
+API_URL := $(shell grep API_URL .test.env | sed 's/API_URL=//')
 
 ### Migrations
 get-migrator:
