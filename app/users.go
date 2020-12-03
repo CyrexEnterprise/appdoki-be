@@ -3,7 +3,6 @@ package app
 import (
 	"appdoki-be/app/repositories"
 	"context"
-	"encoding/json"
 	"firebase.google.com/go/v4/messaging"
 	"fmt"
 	"github.com/gorilla/mux"
@@ -142,21 +141,12 @@ func (h *UsersHandler) GiveBeers(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		giverJSON, _ := json.Marshal(transfer.Giver)
-		receiverJSON, _ := json.Marshal(transfer.Receiver)
 		notification := &messaging.Notification{
 			Title: "BeerTab event",
 			Body:  fmt.Sprintf("%s just rewarded %s with %d beers!", transfer.Giver.Name, transfer.Receiver.Name, beers),
 		}
-		data := map[string]string{
-			"id":    	strconv.Itoa(transferID),
-			"giver":    string(giverJSON),
-			"receiver": string(receiverJSON),
-			"beers":    strconv.Itoa(beers),
-			"givenAt":  transfer.GivenAt,
-		}
 
-		h.notifier.notifyAll(beersTopic, notification, data)
+		h.notifier.notifyAll(beersTopic, notification, transfer.ToStringMap())
 	}()
 
 	respondNoContent(w, http.StatusNoContent)

@@ -2,8 +2,10 @@ package repositories
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/jmoiron/sqlx"
+	"strconv"
 )
 
 type BeerTransferFeedItem struct {
@@ -12,6 +14,19 @@ type BeerTransferFeedItem struct {
 	GivenAt  string `json:"givenAt" db:"given_at"`
 	Giver    User   `json:"giver"`
 	Receiver User   `json:"receiver"`
+}
+
+func (t *BeerTransferFeedItem) ToStringMap() map[string]string {
+	giverJSON, _ := json.Marshal(t.Giver)
+	receiverJSON, _ := json.Marshal(t.Receiver)
+
+	return map[string]string{
+		"id":    	strconv.Itoa(t.ID),
+		"giver":    string(giverJSON),
+		"receiver": string(receiverJSON),
+		"beers":    strconv.Itoa(t.Beers),
+		"givenAt":  t.GivenAt,
+	}
 }
 
 type BeerFeedPaginationOptions struct {
