@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func TestAPI_ListBeerTransfers(t *testing.T) {
+func testBeers(t *testing.T) {
 	t.Run("expect GET /beers to have default pagination", func(t *testing.T) {
 		res, err := http.Get(apiURL + "/beers")
 		if err != nil {

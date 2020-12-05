@@ -17,24 +17,32 @@ func TestMain(m *testing.M) {
 }
 
 func TestAPI_Root(t *testing.T) {
-	res, err := http.Get(apiURL + "/")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer res.Body.Close()
+	t.Run("/", testRoot)
+	t.Run("/users", testUsers)
+	t.Run("/beers", testBeers)
+}
 
-	if res.StatusCode != http.StatusOK {
-		t.Fatal("expected 200 status code")
-	}
+func testRoot(t *testing.T) {
+	t.Run("expect GET /beers to have default pagination", func (t *testing.T) {
+		res, err := http.Get(apiURL + "/")
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer res.Body.Close()
 
-	body, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		t.Fatal("expected to be able to read response body")
-	}
+		if res.StatusCode != http.StatusOK {
+			t.Fatal("expected 200 status code")
+		}
 
-	var response app.HomeResponse
-	err = json.Unmarshal(body, &response)
-	if err != nil {
-		t.Fatal("expected to be able to parse response body")
-	}
+		body, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			t.Fatal("expected to be able to read response body")
+		}
+
+		var response app.HomeResponse
+		err = json.Unmarshal(body, &response)
+		if err != nil {
+			t.Fatal("expected to be able to parse response body")
+		}
+	})
 }
