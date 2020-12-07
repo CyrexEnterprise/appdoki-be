@@ -162,6 +162,19 @@ func (h *UsersHandler) BeersSummary(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	user, err := h.userRepo.FindByID(r.Context(), userID)
+	if err != nil {
+		respondInternalError(w)
+		return
+	}
+
+	if user == nil {
+		respondJSON(w, &appError{
+			Errors: []string{"user not found"},
+		}, http.StatusNotFound)
+		return
+	}
+
 	beerLog, err := h.userRepo.GetBeerTransfersSummary(r.Context(), userID)
 	if err != nil {
 		respondInternalError(w)

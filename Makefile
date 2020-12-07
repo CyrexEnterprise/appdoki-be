@@ -1,7 +1,7 @@
 OS_NAME := $(shell uname -s | tr A-Z a-z)
 SHELL := /bin/bash
 DB_URI := $(shell grep DB_URI .env | sed 's/DB_URI=//')
-API_URL := $(shell grep API_URL .test.env | sed 's/API_URL=//')
+API_URL := $(shell grep API_URL .env | sed 's/API_URL=//')
 
 ### Migrations
 get-migrator:
@@ -37,9 +37,6 @@ compose-integration:
 	export $$(cat .test.env | xargs) && docker-compose -f docker-compose.dev.yml up -d --force-recreate --build
 
 ### tests
-seed:
-	cd seed && go run . $(DB_URI)
-
 test:
 	go test ./app/... -v
 
@@ -47,11 +44,6 @@ test-color:
 	go test ./app/... -v | sed ''/PASS/s//$$(printf "\033[32mPASS\033[0m")/'' | sed ''/FAIL/s//$$(printf "\033[31mFAIL\033[0m")/''
 
 integration-tests:
-	API_URL=$(API_URL) go test ./tests/... -v
+	API_URL=$(API_URL) DB_URI=$(DB_URI) go test ./tests/... -v
 
-wait:
-	sleep 5
-
-integration-tests-compose: compose-integration wait seed integration-tests
-
-integration-tests-local: seed integration-tests
+integration-tests-compose: compose-integration integration-tests

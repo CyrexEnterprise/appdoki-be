@@ -1,4 +1,4 @@
-package main
+package seeder
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func (s *seeder) seedBeerTransfers() {
+func (s *Seeder) SeedBeerTransfers() {
 	gofakeit.Seed(0)
 
 	var transfers [][]string
@@ -28,9 +28,8 @@ func (s *seeder) seedBeerTransfers() {
 
 	_, err := s.db.Exec(sqlStr)
 	if err != nil {
-		log.Fatalf("seedBeerTransfers failed: %+v", err)
+		log.Fatalf("SeedBeerTransfers failed: %+v", err)
 	}
-	log.Info("beers users")
 }
 
 func generateRandomBeerTransfer() []string {
@@ -45,5 +44,12 @@ func generateRandomBeerTransfer() []string {
 		strconv.Itoa(receiverID),
 		strconv.Itoa(gofakeit.Number(1, 50)),
 		gofakeit.DateRange(time.Date(2018, 1, 1, 0, 0, 0, 0, time.UTC), time.Now()).Format(time.RFC3339),
+	}
+}
+
+func (s *Seeder) TruncateBeerTransfers() {
+	_, err := s.db.Exec("TRUNCATE beer_transfers RESTART IDENTITY CASCADE;")
+	if err != nil {
+		log.Fatalf("TruncateBeerTransfers failed: %+v", err)
 	}
 }
