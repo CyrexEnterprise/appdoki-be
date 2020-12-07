@@ -9,6 +9,10 @@ import (
 )
 
 func testBeers(t *testing.T) {
+	seeds.SeedUsers()
+	seeds.SeedBeerTransfers()
+	defer seeds.TruncateAll()
+
 	t.Run("expect GET /beers to have default pagination", func(t *testing.T) {
 		res, err := http.Get(apiURL + "/beers")
 		if err != nil {

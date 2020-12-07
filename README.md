@@ -45,21 +45,15 @@ Integration tests are kept in `./tests` and are developed using Go's testing lib
 These can be run against an existing application or on an isolated Docker environment. 
 All necessary commands are available in the Makefile.
 
-Prepare for tests by copying `.env` to `.test.env` and changing accordingly. 
-Some variables are very important to set while running tests:
+It's important that the running application has the environment variable `TEST_MODE` set to `true`.
 
-```
-API_URL=http://localhost:4001
-TEST_MODE=true
-```
+The tests themselves need two variables: `API_URL` with the URl of where the API is running; `DB_URI` as in the application.
 
-Executing `make integration-tests-compose` will create Docker containers for the API and 
-database, seed the database with test data and run the tests.
+Executing `make integration-tests-compose` will create Docker containers for the API and database and run the tests.
 
 It's also possible to prepare only the containers (`make compose-integration`) and 
 leave test running for yourself to, for example, debug the tests in the IDE. 
 
-Seeds are also generated in Go files. Find them in `./seed`.
 
 #### In-Test Authentication
 

@@ -23,7 +23,7 @@ func TestMain(m *testing.M) {
 func TestAPI_Root(t *testing.T) {
 	t.Run("/", testRoot)
 	t.Run("/users", testUsers)
-	//t.Run("/beers", testBeers)
+	t.Run("/beers", testBeers)
 }
 
 func testRoot(t *testing.T) {

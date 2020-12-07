@@ -127,6 +127,19 @@ func (h *UsersHandler) GiveBeers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	user, err := h.userRepo.FindByID(r.Context(), takerUserId)
+	if err != nil {
+		respondInternalError(w)
+		return
+	}
+
+	if user == nil {
+		respondJSON(w, &appError{
+			Errors: []string{"user not found"},
+		}, http.StatusNotFound)
+		return
+	}
+
 	transferID, err := h.userRepo.AddBeerTransfer(r.Context(), userID, takerUserId, beers)
 	if err != nil {
 		respondInternalError(w)
