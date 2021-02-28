@@ -15,13 +15,11 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o appdokibin .
 # FINAL STAGE
 FROM alpine:latest
 
-RUN apk --no-cache add ca-certificates
 WORKDIR /root/
 
 COPY --from=builder /app/appdokibin .
-COPY --from=builder /app/wait .
 COPY --from=builder /app/swaggerui ./swaggerui
 COPY --from=builder /app/migrations ./migrations
 
 EXPOSE 4000
-CMD ./wait && ./appdokibin
+CMD ./appdokibin

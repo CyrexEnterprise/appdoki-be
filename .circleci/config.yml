@@ -4,9 +4,16 @@ executors:
     environment:
       IMAGE_NAME: cloudokihub/appdoki-be
     docker:
-      - image: circleci/buildpack-deps:stretch
+      - image: cimg/base:2020.01
 
 jobs:
+  test:
+    docker:
+      - image: cimg/go:1.16.0
+    steps:
+      - checkout
+      - run: go test ./app/... -v
+
   build:
     executor: publisher
     steps:
@@ -20,6 +27,7 @@ jobs:
           command: |
             echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
             docker push $IMAGE_NAME
+
   deploy:
     machine: true
     steps:
