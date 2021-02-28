@@ -9,7 +9,7 @@ executors:
 jobs:
   test:
     docker:
-      - image: cimg/go:1.16.0
+      - image: cimg/go:1.15
     steps:
       - checkout
       - run: go test ./app/... -v
