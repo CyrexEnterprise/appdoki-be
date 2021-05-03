@@ -2,7 +2,6 @@ package config
 
 import (
 	"context"
-	"fmt"
 	"github.com/coreos/go-oidc"
 	"golang.org/x/oauth2"
 	"os"
@@ -56,8 +55,6 @@ func NewConfig() *Config {
 	if err != nil {
 		panic(err)
 	}
-
-	fmt.Println(getEnvAsBool("TEST_MODE", false))
 
 	return &Config{
 		Server: ServerConfig{
