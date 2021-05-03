@@ -9,7 +9,7 @@ executors:
 jobs:
   test:
     docker:
-      - image: cimg/go:1.15
+      - image: cimg/go:1.16
     steps:
       - checkout
       - run: go test ./app/... -v
@@ -34,12 +34,12 @@ jobs:
       - checkout
       - add_ssh_keys:
           fingerprints:
-            - "fb:0a:f3:01:af:80:61:20:08:60:93:db:de:70:9d:47"
+            - "cf:04:e1:6b:66:0c:8f:80:a9:b9:77:21:12:15:aa:d9"
       - run:
           name: Deploy Over SSH
           command: |
             scp -r -o StrictHostKeyChecking=no docker-compose.yml Makefile $SSH_USER@$SSH_HOST:~/appdoki/
-            ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "cd appdoki && make compose-update"
+            ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "cd appdoki && docker-compose pull && docker-compose up -d"
 
 workflows:
   version: 2
