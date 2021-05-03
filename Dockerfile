@@ -1,5 +1,5 @@
 # BUILD STAGE
-FROM golang:1.15-alpine as builder
+FROM golang:1.16-alpine as builder
 
 ENV GO111MODULE=on
 RUN apk update && apk add --no-cache git
