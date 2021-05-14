@@ -18,6 +18,12 @@ Aim for API-first development (find the contract in `swaggerui/openapi.yml`).
 
 [API contract](swaggerui/openapi.yml) follows [OpenAPI v3](https://swagger.io/docs/specification/about/).
 
+Always lint the API spec:
+
+```
+npx @stoplight/spectral lint swaggerui/openapi.yml --ruleset=https://raw.githubusercontent.com/Cloudoki/openapi-style-guide/main/spec.yaml
+```
+
 ### Database
 
 Database changes are achieved via migrations.

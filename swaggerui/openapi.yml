@@ -1,11 +1,51 @@
 openapi: 3.0.3
+
 info:
   version: 1.0.0
   title: appdoki API
   description: REST API server for Cloudoki's appdoki
   license:
     name: MIT
+
+servers:
+  - url: https://appdokiapi.cloudoki.com
+
+tags:
+  - name: home
+    description: Basic API information
+  - name: users
+    description: User related endpoints and operations
+  - name: beers
+    description: Beer exchanges and logs
+  - name: authentication
+    description: Authentication & OIDC related endpoints
+
 paths:
+  /:
+    get:
+      tags: [ home ]
+      description: API home
+      responses:
+        '200':
+          description: API basic information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  Version:
+                    type: string
+                  DocsEndpoint:
+                    type: string
+                  MessagingTopics:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        Topic:
+                          type: string
+                        Description:
+                          type: string
   /users:
     get:
       tags: [ users ]
@@ -218,10 +258,8 @@ components:
           id:
             type: number
           giver:
-            type: object
             $ref: '#/components/schemas/User'
           receiver:
-            type: object
             $ref: '#/components/schemas/User'
           givenAt:
             type: string
